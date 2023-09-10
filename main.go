@@ -143,39 +143,7 @@ func setupSetting() error {
 	if err != nil {
 		return err
 	}
-	err = s.ReadSection("Database", &global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("Redis", &global.RedisSetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("RabbitMQ", &global.RabbitMQSetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("Security", &global.SecuritySetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("JWT", &global.JWTSetting)
-	if err != nil {
-		return err
-	}
 	err = s.ReadSection("Email", &global.EmailSetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("WechatJSAPIPay", &global.WechatJSAPIPaySetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("WechatH5Pay", &global.WechatH5PaySetting)
-	if err != nil {
-		return err
-	}
-	err = s.ReadSection("AlipayH5Pay", &global.AlipayH5PaySetting)
 	if err != nil {
 		return err
 	}
@@ -186,7 +154,6 @@ func setupSetting() error {
 	}
 
 	global.AppSetting.DefaultContextTimeout *= time.Second
-	global.JWTSetting.Expire *= time.Second
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
 	if port != "" {

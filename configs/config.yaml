@@ -19,6 +19,15 @@ App:
     - .jpg
     - .jpeg
     - .png
+Email:
+  Host: smtp.qq.com
+  Port: 465
+  UserName: xxx
+  Password: xxx
+  IsSSL: true
+  From: xxx
+  To:
+    - xxx
 OSS:
   BucketName:
   AccessURLDomain: https://.com/
