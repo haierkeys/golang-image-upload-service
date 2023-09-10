@@ -1,0 +1,27 @@
+Server:
+  RunMode: debug
+  HttpPort: 8000
+  ReadTimeout: 60
+  WriteTimeout: 60
+  PrivateHttpListen: 8001  #私有端口用于监听
+  OpenServiceListen: 8002  #私有端口用于监听
+App:
+  DefaultPageSize: 10
+  MaxPageSize: 100
+  DefaultContextTimeout: 60
+  LogSavePath: storage/logs
+  LogFileName: app
+  LogFileExt: .log
+  UploadSavePath: storage/uploads
+  UploadServerUrl: http://127.0.0.1:8000/static
+  UploadImageMaxSize: 5  # MB
+  UploadImageAllowExts:
+    - .jpg
+    - .jpeg
+    - .png
+OSS:
+  BucketName:
+  AccessURLDomain: https://.com/
+  Endpoint:
+  AccessKeyID:
+  AccessKeySecret :

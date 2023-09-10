@@ -1,0 +1,3 @@
+package errcode
+
+var ()

@@ -1,2 +1,9 @@
-# obsidian_image_upload_golang_service
-obsidian_image_upload_golang_service
+
+golang-image-upload-service For obsidian-auto-image-remote-uploader
+
+
+
+
+
+obsidian-auto-image-remote-uploader
+https://github.com/haierspi/obsidian-auto-image-remote-uploader
