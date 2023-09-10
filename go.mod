@@ -9,7 +9,6 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.15.3
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/juju/ratelimit v1.0.2
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1

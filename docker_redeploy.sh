@@ -8,7 +8,7 @@ Usage() {
     echo "Usage:"
     echo "test.sh [-t Git tag]"
     echo "Description:"
-    exit -1
+    exit
 }
 
 while getopts ':t:h:' OPT; do
