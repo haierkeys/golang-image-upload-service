@@ -1,10 +1,11 @@
 Server:
   RunMode: debug
+  #服务端口
   HttpPort: 8000
   ReadTimeout: 60
   WriteTimeout: 60
-  PrivateHttpListen: 8001  #私有端口用于监听
-  OpenServiceListen: 8002  #私有端口用于监听
+  #性能监听接口
+  PrivateHttpListen: 8001
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
@@ -13,12 +14,15 @@ App:
   LogFileName: app
   LogFileExt: .log
   UploadSavePath: storage/uploads
-  UploadServerUrl: http://127.0.0.1:8000/static
+  # 上传附件访问地址
+  UploadServerUrl: http://127.0.0.1:8000/storage/uploads
   UploadImageMaxSize: 5  # MB
   UploadImageAllowExts:
     - .jpg
     - .jpeg
     - .png
+Security:
+  AuthToken: 6666
 Email:
   Host: smtp.qq.com
   Port: 465

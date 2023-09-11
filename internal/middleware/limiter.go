@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/haierspi/golang-image-upload-service/pkg/app"
-	"github.com/haierspi/golang-image-upload-service/pkg/errcode"
+	"github.com/haierspi/golang-image-upload-service/pkg/code"
 	"github.com/haierspi/golang-image-upload-service/pkg/limiter"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ func RateLimiter(l limiter.Face) gin.HandlerFunc {
 			count := bucket.TakeAvailable(1)
 			if count == 0 {
 				response := app.NewResponse(c)
-				response.ToErrorResponse(errcode.TooManyRequests)
+				response.ToResponse(code.ErrorTooManyRequests)
 				c.Abort()
 				return
 			}

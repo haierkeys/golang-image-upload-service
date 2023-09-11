@@ -1,10 +1,9 @@
 package app
 
 import (
-	"net/http"
 	"reflect"
 
-	"github.com/haierspi/golang-image-upload-service/pkg/errcode"
+	"github.com/haierspi/golang-image-upload-service/pkg/code"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,34 +28,28 @@ type ListRes struct {
 }
 
 type ResResult struct {
-	// HTTP状态码
-	Code interface{} `json:"code"`
 	// 业务状态码
-	Status interface{} `json:"status"`
+	Code interface{} `json:"code"`
 	// 失败&&成功消息
-	Msg interface{} `json:"msg"`
+	Msg interface{} `json:"message"`
 	// 数据集合
 	Data interface{} `json:"data"`
 }
 
 type ResListResult struct {
-	// HTTP状态码
-	Code interface{} `json:"code"`
 	// 业务状态码
-	Status interface{} `json:"status"`
+	Code interface{} `json:"code"`
 	// 失败&&成功消息
-	Msg interface{} `json:"msg"`
+	Msg interface{} `json:"message"`
 	// 数据集合
 	Data ListRes `json:"data"`
 }
 
 type ErrResult struct {
-	// HTTP状态码
-	Code interface{} `json:"code"`
 	// 业务状态码
-	Status interface{} `json:"status"`
+	Code interface{} `json:"code"`
 	// 失败&&成功消息
-	Msg interface{} `json:"msg"`
+	Msg interface{} `json:"message"`
 	// 错误格式数据
 	Data interface{} `json:"data"`
 	// 错误支付
@@ -69,12 +62,7 @@ func NewResponse(ctx *gin.Context) *Response {
 	}
 }
 
-// 解析gin中参数 并设置为字符串属性 用于判断参数类型零值的问题
-//
-//	type ListOrderRequest struct {
-//		Status    int64  `form:"status" request:"StatusStr"` //状态
-//		StatusStr string //会自动根据上面的 request tag 设置这个值
-//	}
+// RequestParamStrParse 解析
 func RequestParamStrParse(c *gin.Context, param any) {
 	tParam := reflect.TypeOf(param).Elem()
 	vParam := reflect.ValueOf(param).Elem()
@@ -92,7 +80,7 @@ func RequestParamStrParse(c *gin.Context, param any) {
 	}
 }
 
-// 获取ip
+// GetRequestIP 获取ip
 func GetRequestIP(c *gin.Context) string {
 	reqIP := c.ClientIP()
 	if reqIP == "::1" {
@@ -111,24 +99,29 @@ func GetAccessHost(c *gin.Context) string {
 	return AccessProto + c.Request.Host
 }
 
-// 输出到浏览器
-func (r *Response) ToResponse(data interface{}) {
-	code := errcode.Success
-	r.SendResponse(http.StatusOK, ResResult{
-		Code:   http.StatusOK,
-		Status: code.Code(),
-		Msg:    code.Msg(),
-		Data:   data,
-	})
+// ToResponse 输出到浏览器
+func (r *Response) ToResponse(code *code.Code) {
 
+	if code.HaveDetails() {
+		r.SendResponse(code.StatusCode(), ErrResult{
+			Code:    code.Code(),
+			Msg:     code.Msg(),
+			Data:    code.Data(),
+			Details: code.Details(),
+		})
+	} else {
+		r.SendResponse(code.StatusCode(), ResResult{
+			Code: code.Code(),
+			Msg:  code.Msg(),
+			Data: code.Data(),
+		})
+	}
 }
 
-func (r *Response) ToResponseList(list interface{}, totalRows int) {
-	code := errcode.Success
-	r.SendResponse(http.StatusOK, ResListResult{
-		Code:   http.StatusOK,
-		Status: code.Code(),
-		Msg:    code.Msg(),
+func (r *Response) ToResponseList(code *code.Code, list interface{}, totalRows int) {
+	r.SendResponse(code.StatusCode(), ResListResult{
+		Code: code.Code(),
+		Msg:  code.Msg(),
 		Data: ListRes{
 			List: list,
 			Pager: Pager{
@@ -140,40 +133,6 @@ func (r *Response) ToResponseList(list interface{}, totalRows int) {
 	})
 }
 
-func (r *Response) ToErrorResponse(err *errcode.Error) {
-	r.SendResponse(err.StatusCode(), ErrResult{
-		Code:    http.StatusOK,
-		Status:  err.Code(),
-		Msg:     err.Msg(),
-		Data:    err.Data(),
-		Details: err.Details(),
-	})
-}
-
-func (r *Response) ToErrorResponseData(err *errcode.Error, errSrc error) {
-	r.SendResponse(err.StatusCode(), ErrResult{
-		Code:   http.StatusOK,
-		Status: err.Code(),
-		Msg:    err.Msg(),
-		Data:   errSrc.Error(),
-	})
-}
-
 func (r *Response) SendResponse(statusCode int, content interface{}) {
-
-	var debug string
-	var exist bool
-
-	debug, exist = r.Ctx.GetQuery("debug")
-
-	if !exist {
-		debug = r.Ctx.GetHeader("debug")
-	}
-
-	if debug != "" {
-
-	}
-
-	r.Ctx.JSON(http.StatusOK, content)
-
+	r.Ctx.JSON(statusCode, content)
 }

@@ -6,8 +6,8 @@ import (
 
 	"github.com/haierspi/golang-image-upload-service/global"
 	"github.com/haierspi/golang-image-upload-service/pkg/app"
+	"github.com/haierspi/golang-image-upload-service/pkg/code"
 	"github.com/haierspi/golang-image-upload-service/pkg/email"
-	"github.com/haierspi/golang-image-upload-service/pkg/errcode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,7 +35,7 @@ func Recovery() gin.HandlerFunc {
 					global.Logger.Panicf(c, "mail.SendMail err: %v", err)
 				}
 
-				app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+				app.NewResponse(c).ToResponse(code.ErrorServerInternal)
 				c.Abort()
 			}
 		}()

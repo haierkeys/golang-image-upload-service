@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/haierspi/golang-image-upload-service/global"
 	"github.com/haierspi/golang-image-upload-service/pkg/util"
@@ -31,6 +32,13 @@ func GetSavePath() string {
 	return global.AppSetting.UploadSavePath
 }
 
+func GetSavePreDirPath() string {
+
+	getYearMonth := time.Now().Format("200601")
+	getDay := time.Now().Format("02")
+	return getYearMonth + "/" + getDay + "/"
+}
+
 func GetServerUrl() string {
 	return global.AppSetting.UploadServerUrl
 }
@@ -51,9 +59,7 @@ func CheckContainExt(t FileType, name string) bool {
 				return true
 			}
 		}
-
 	}
-
 	return false
 }
 
@@ -91,6 +97,11 @@ func SaveFile(file *multipart.FileHeader, dst string) error {
 		return err
 	}
 	defer src.Close()
+
+	err = os.MkdirAll(path.Dir(dst), os.ModePerm)
+	if err != nil {
+		return err
+	}
 
 	out, err := os.Create(dst)
 	if err != nil {

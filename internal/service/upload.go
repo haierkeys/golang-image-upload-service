@@ -10,8 +10,8 @@ import (
 )
 
 type FileInfo struct {
-	Name      string
-	AccessUrl string
+	ImageTitle string `json:"imageTitle"`
+	ImageUrl   string `json:"imageUrl"`
 }
 
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
@@ -33,11 +33,12 @@ func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fi
 		return nil, errors.New("insufficient file permissions.")
 	}
 
-	dst := uploadSavePath + "/" + fileName
-	if err := upload.SaveFile(fileHeader, dst); err != nil {
+	preDirPath := upload.GetSavePreDirPath() + fileName
+	if err := upload.SaveFile(fileHeader, uploadSavePath+"/"+preDirPath); err != nil {
 		return nil, err
 	}
 
-	accessUrl := global.AppSetting.UploadServerUrl + "/" + fileName
-	return &FileInfo{Name: fileName, AccessUrl: accessUrl}, nil
+	accessUrl := global.AppSetting.UploadServerUrl + "/" + preDirPath
+
+	return &FileInfo{ImageTitle: "", ImageUrl: accessUrl}, nil
 }

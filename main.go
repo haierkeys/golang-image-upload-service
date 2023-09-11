@@ -143,6 +143,10 @@ func setupSetting() error {
 	if err != nil {
 		return err
 	}
+	err = s.ReadSection("Security", &global.SecuritySetting)
+	if err != nil {
+		return err
+	}
 	err = s.ReadSection("Email", &global.EmailSetting)
 	if err != nil {
 		return err
