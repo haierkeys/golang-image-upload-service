@@ -5,7 +5,6 @@ import (
 	_ "expvar"
 	"flag"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"log"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
@@ -23,13 +24,14 @@ import (
 	validatorV10 "github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/haierspi/golang-image-upload-service/global"
 	"github.com/haierspi/golang-image-upload-service/internal/routers"
 	"github.com/haierspi/golang-image-upload-service/pkg/logger"
 	"github.com/haierspi/golang-image-upload-service/pkg/setting"
 	"github.com/haierspi/golang-image-upload-service/pkg/tracer"
 	"github.com/haierspi/golang-image-upload-service/pkg/validator"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -62,10 +64,10 @@ func init() {
 		log.Fatalf("init.setupValidator err: %v", err)
 	}
 
-	//err = setupTracer()
-	//if err != nil {
+	// err = setupTracer()
+	// if err != nil {
 	//	log.Fatalf("init.setupTracer err: %v", err)
-	//}
+	// }
 }
 
 func main() {
@@ -88,7 +90,7 @@ func main() {
 	log.Println("Http API Service ListenAndServe On: ", global.ServerSetting.HttpPort, "\n")
 	router := routers.NewRouter()
 	s := &http.Server{
-		Addr:           ":" + global.ServerSetting.HttpPort,
+		Addr:           global.ServerSetting.HttpPort,
 		Handler:        router,
 		ReadTimeout:    global.ServerSetting.ReadTimeout,
 		WriteTimeout:   global.ServerSetting.WriteTimeout,

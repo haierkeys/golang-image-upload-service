@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/pprof"
 
+	"github.com/gookit/goutil/dump"
+
 	"github.com/haierspi/golang-image-upload-service/global"
 
 	"github.com/gin-gonic/gin"
@@ -27,9 +29,9 @@ func MetricsSrv() {
 	log.Println("PrivateHttp Metric Service ListenAndServe On: ", global.ServerSetting.PrivateHttpListen, "\n")
 
 	router := gin.New()
-	//router.Use(logs.RecoveryWithZap(logs.Logger, true))
+	// router.Use(logs.RecoveryWithZap(logs.Logger, true))
 
-	//prom监控
+	// prom监控
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
 
 	if global.ServerSetting.RunMode == "debug" {
@@ -37,7 +39,7 @@ func MetricsSrv() {
 	}
 
 	s := &http.Server{
-		Addr:           ":" + global.ServerSetting.PrivateHttpListen,
+		Addr:           global.ServerSetting.PrivateHttpListen,
 		Handler:        router,
 		ReadTimeout:    global.ServerSetting.ReadTimeout,
 		WriteTimeout:   global.ServerSetting.WriteTimeout,
@@ -45,6 +47,7 @@ func MetricsSrv() {
 	}
 
 	err := s.ListenAndServe()
+	dump.P(err)
 	fmt.Println("PrivateHttp Metric Service start err", "err", err)
 }
 
