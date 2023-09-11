@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/haierspi/golang-image-upload-service/global"
 	"github.com/haierspi/golang-image-upload-service/internal/service"
 	"github.com/haierspi/golang-image-upload-service/pkg/app"
@@ -18,6 +19,10 @@ func NewUpload() Upload {
 func (u Upload) UploadFile(c *gin.Context) {
 	response := app.NewResponse(c)
 	file, fileHeader, err := c.Request.FormFile("imagefile")
+
+	defer file.Close()
+
+	// dump.P(file)
 
 	if err != nil {
 		response.ToResponse(code.ErrorInvalidParams.WithDetails(err.Error()))

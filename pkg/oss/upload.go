@@ -2,11 +2,28 @@ package oss
 
 import (
 	"io"
+	"mime/multipart"
 	"net/http"
 	"strings"
 
 	"github.com/haierspi/golang-image-upload-service/global"
 )
+
+// UploadByFile 上传文件
+func UploadByFile(path string, f multipart.File) error {
+
+	bucket, err := GetBucket(global.OSSSetting.BucketName)
+
+	if err != nil {
+		return err
+	}
+
+	err = bucket.PutObject(path, f)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func UploadByString(path string, content string) error {
 

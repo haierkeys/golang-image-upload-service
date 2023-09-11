@@ -1,11 +1,13 @@
 package service
 
 import (
-	"errors"
 	"mime/multipart"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/haierspi/golang-image-upload-service/global"
+	"github.com/haierspi/golang-image-upload-service/pkg/oss"
 	"github.com/haierspi/golang-image-upload-service/pkg/upload"
 )
 
@@ -15,6 +17,9 @@ type FileInfo struct {
 }
 
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
+
+	var accessUrlPre string
+
 	fileName := upload.GetFileName(fileHeader.Filename)
 	if !upload.CheckContainExt(fileType, fileName) {
 		return nil, errors.New("file suffix is not supported.")
@@ -33,12 +38,22 @@ func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fi
 		return nil, errors.New("insufficient file permissions.")
 	}
 
-	preDirPath := upload.GetSavePreDirPath() + fileName
-	if err := upload.SaveFile(fileHeader, uploadSavePath+"/"+preDirPath); err != nil {
+	dateDirFileName := upload.GetSavePreDirPath() + fileName
+	if err := upload.SaveFile(fileHeader, uploadSavePath+"/"+dateDirFileName); err != nil {
 		return nil, err
 	}
+	accessUrlPre = global.AppSetting.UploadServerUrl
 
-	accessUrl := global.AppSetting.UploadServerUrl + "/" + preDirPath
+	// 阿里云oss
+	if global.OSSSetting.BucketName != "" {
+		err := oss.UploadByFile(dateDirFileName, file)
+		if err != nil {
+			return nil, errors.Wrap(err, "oss.UploadByFile err")
+		}
+		accessUrlPre = global.OSSSetting.AccessURLDomain
+	}
+
+	accessUrl := accessUrlPre + "/" + dateDirFileName
 
 	return &FileInfo{ImageTitle: "", ImageUrl: accessUrl}, nil
 }
