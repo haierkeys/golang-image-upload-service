@@ -21,6 +21,10 @@ App:
     - .jpg
     - .jpeg
     - .png
+    - .bmp
+    - .gif
+    - .svg
+    - .tiff
 Security:
   AuthToken: 6666
 Email:

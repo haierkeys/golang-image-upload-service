@@ -50,7 +50,6 @@ func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fi
 		if err != nil {
 			return nil, errors.Wrap(err, "oss.UploadByFile err")
 		}
-		accessUrlPre = global.OSSSetting.AccessURLDomain
 	}
 
 	accessUrl := accessUrlPre + "/" + dateDirFileName

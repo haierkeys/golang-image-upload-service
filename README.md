@@ -1,15 +1,19 @@
 [中文文档](readme-zh.md)
-# Obsidian Auto Image Remote Uploader
+[English Document](README.md)
 
-Add remote image uploading and saving function for Obsidian, main features:
+[English Document](README.md)
 
-- Drag and drop image upload
-- Paste Image Upload
-- Right click image upload
-- Batch download web images to local
-- Batch upload all local image files in notes
-- Batch upload all local image files of notes to a remote server, e.g. your web server or your home NAS.
-- You can choose to synchronize to cloud storage at the same time, e.g. AliCloud OSS / AWS S3 / Google ECS.
+# Golang Image Upload Service
+
+Image upload/storage/synchronization service for the obsidian-auto-image-remote-uploader plugin.
+
+- Support image upload
+- support authorization tokens, increase API security
+- image http access (basic function, suggest to use nginx instead)
+- Synchronization cloud storage (AliCloud OSS, Amazon S3, Google ECS).
+- Docker command installation, easy to use in the home NAS and websites
+- No need to build an environment to download and run directly
+
 ## Price
 
 This plugin is provided free of charge to everyone, but if you would like to show your appreciation or help support the continued development, please feel free to provide me with a little help in any of the following ways:
@@ -20,54 +24,101 @@ This plugin is provided free of charge to everyone, but if you would like to sho
 <img src="https://raw.githubusercontent.com/haierspi/obsidian-auto-image-remote-uploader/main/bmc_qr.png" style="width:120px;height:auto;">
 
 - afdian: https://afdian.net/a/haierspi
-
 # Getting Started
 
-1. Install the plugin
-2. Open the plugin configuration item, set **image-upload-api** to your image upload API `http://127.0.0.1:8000/api/upload`, and set **authorization-token**.
-3. Start the **golang-image-upload-service** service.
-4. Open the **golang-image-upload-service** service and see if it uploads successfully
+## Containerized installation (docker way)
 
-## Image upload API server
+Assuming your server image storage path is */data/storage/uploads*, run the following commands in order to install your server.
 
-This plugin requires **golang-image-upload-service** https://github.com/haierspi/golang-image-upload-service to work properly.
+Execute the following commands in order
 
-## Help
+```bash
+# Download the container image
+docker pull haierspi/golang-image-upload-service:latest
 
-## Clipboard Upload
+# Create the necessary directories for the project to run
+mkdir -p /data/configs
+mkdir -p /data/storage/logs
+mkdir -p /data/storage/uploads
 
-Support uploading images directly when you paste them from clipboard, currently support copying images from the system and uploading them directly.
-Support to control single file upload by setting `frontmatter`, default value is `true`, to turn off control, please set the value to `false`.
+# Download the default configuration to the config file directory
+wget https://raw.githubusercontent.com/haierspi/golang-image-upload-service/main/configs/config.yaml -O /data/configs/config.yaml
 
-Support ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg", ".tiff".
+# Create & start the container
+docker run -tid --name image-api \
+        -p 8000:8000 -p 8001:8001 \
+        -v /data/storage/logs/:/api/storage/logs/ \
+        -v /data/storage/uploads/:/api/storage/uploads/ \
+        -v /data/configs/:/api/configs/ \
+        haierspi/golang-image-upload-service:latest
 
-```yaml
----
-image-auto-upload: true
----
 ```
 
-## Batch upload all image files in a file
+## Binary download and installation
 
-Type `ctrl+P` to call out the panel, type `upload all images`, hit enter and the upload will start automatically.
+https://github.com/haierspi/golang-image-upload-service/releases Download the latest version
 
-Path resolution priority, it will look up the paths in order of priority:
+Unzip it to the appropriate directory and run
+## Configuration
 
-1. absolute path, refers to the absolute path based on the library
-2. relative paths, which start with . / or . / or .
-3. as short as possible
+Configuration file path *. /configs/config.yaml*
 
-## Batch download web images to local
+The default content is as follows
 
-Type `ctrl+P` to call out the panel, type `download all images` and click enter, the download will start automatically.
+```yaml
+RunMode: debug
+  RunMode: debug
+  # Service ports in the form IP:PORT (destined to listen on IP) or :PORT (listen on all)
+  HttpPort: :8000
+  ReadTimeout: 60
+  WriteTimeout: 60
+  # Performance Listening Interface
+  PrivateHttpListen: :8001
+PrivateHttpListen: :8001
+  # Image Upload API Authorization TOKEN
+  AuthToken: 6666
+App.
+  DefaultPageSize: 10
+  MaxPageSize: 100
+  DefaultContextTimeout: 60
+  LogSavePath: storage/logs
+  LogFileName: app
+  LogFileExt: .log
+  # Image file storage address
+  UploadSavePath: storage/uploads
+  # Set the prefix of the local image access address, need to include UploadSavePath.
+  UploadServerUrl: http://127.0.0.1:8000/storage/uploads
+  # Upload size limit Unit MB
+  UploadImageMaxSize: 5
+  # Image limit
+  UploadImageAllowExts:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .gif
+    - .svg
+    - .tiff
+# AliCloud OSS
+OSS:
+  BucketName:
+  Endpoint:
+  AccessKeyID:
+  AccessKeySecret:
+Email:
+  Host: smtp.gmail.com
+  Port: 465
+  UserName: xxx
+  Password: xxx
+  IsSSL: true
+  From: xxx
+  To:
+    - xxx
+```
+## TODO
 
-## Support right-click menu to upload images
+## Other
 
-Standard md and wiki formats are supported. Relative and absolute paths are supported, you need to set them correctly, otherwise it will cause strange problems.
+Obsidian Auto Image Remote Uploader
 
-## Drag-and-drop uploading
-Drag and drop of images is supported.
-
-## Thanks to
-
-https://github.com/renmu123/obsidian-image-auto-upload-plugin
+https://github.com/haierspi/obsidian-auto-image-remote-uploader

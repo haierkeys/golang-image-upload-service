@@ -2,7 +2,7 @@
 
 # Golang Image Upload Service
 
-为 obsidian-auto-image-remote-uploader 提供图片上传/存储/同步云存储服务
+为 obsidian-auto-image-remote-uploader 插件提供图片上传/存储/同步云存储服务
 
 - 支持图片上传
 - 支持授权令牌,增加API安全
@@ -54,50 +54,71 @@ docker run -tid --name image-api \
 
 ## 二进制下载安装
 
-下载对应的服务器版本
+https://github.com/haierspi/golang-image-upload-service/releases 下载最新版本
 
+解压到相应的目录执行
 
+## 配置
 
-## 图片上传API服务端
+配置文件路径 *./configs/config.yaml*
 
-本插件需要配合**golang-image-upload-service** https://github.com/haierspi/golang-image-upload-service 才能正常使用
-
-# 使用帮助
-
-## 剪切板上传
-
-支持黏贴剪切板的图片的时候直接上传，目前支持复制系统内图像直接上传。
-支持通过设置 `frontmatter` 来控制单个文件的上传，默认值为 `true`，控制关闭请将该值设置为 `false`
-
-支持 ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg", ".tiff"
+默认内容如下
 
 ```yaml
----
-image-auto-upload: true
----
+Server:
+  RunMode: debug
+  # 服务端口 格式为 IP:PORT (注定监听IP) 或者 :PORT (监听所有)
+  HttpPort:  :8000
+  ReadTimeout: 60
+  WriteTimeout: 60
+  # 性能监听接口
+  PrivateHttpListen:  :8001
+Security:
+  # 图片上传API授权TOKEN
+  AuthToken: 6666
+App:
+  DefaultPageSize: 10
+  MaxPageSize: 100
+  DefaultContextTimeout: 60
+  LogSavePath: storage/logs
+  LogFileName: app
+  LogFileExt: .log
+  # 图片文件存储地址
+  UploadSavePath: storage/uploads
+  # 设置本地图片访问地址前缀,需要包含 UploadSavePath
+  UploadServerUrl: http://127.0.0.1:8000/storage/uploads
+  # 上传大小限制 单位MB
+  UploadImageMaxSize: 5
+  # 图片限制
+  UploadImageAllowExts:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .gif
+    - .svg
+    - .tiff
+# 阿里云OSS
+OSS:
+  BucketName:
+  Endpoint:
+  AccessKeyID:
+  AccessKeySecret:
+Email:
+  Host: smtp.gmail.com
+  Port: 465
+  UserName: xxx
+  Password: xxx
+  IsSSL: true
+  From: xxx
+  To:
+    - xxx
+
 ```
+## TODO
 
-## 批量上传一个文件中的所有图像文件
+## 其他
 
-输入 `ctrl+P` 呼出面板，输入 `upload all images`，点击回车，就会自动开始上传。
+Obsidian Auto Image Remote Uploader
 
-路径解析优先级，会依次按照优先级查找：
-
-1. 绝对路径，指基于库的绝对路径
-2. 相对路径，以./或../开头
-3. 尽可能简短的形式
-
-## 批量下载网络图片到本地
-
-输入 `ctrl+P` 呼出面板，输入 `download all images`，点击回车，就会自动开始下载。
-
-## 支持右键菜单上传图片
-
-目前已支持标准 md 以及 wiki 格式。支持相对路径以及绝对路径，需要进行正确设置，不然会引发奇怪的问题。
-
-## 支持拖拽上传
-支持图片的各种拖拽
-
-## 感谢
-
-https://github.com/renmu123/obsidian-image-auto-upload-plugin
+https://github.com/haierspi/obsidian-auto-image-remote-uploader
