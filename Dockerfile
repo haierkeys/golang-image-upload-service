@@ -9,7 +9,7 @@ EXPOSE 8000 8001 8002
 RUN mkdir -p /api/
 VOLUME /api/configs
 VOLUME /api/storage
-COPY ./build/image-api /api/image-api
+COPY ./build/linux/image-api /api/image-api
 CMD ["sh", "-c","cd /api/ \
     && touch storage/logs/c.log \
     && mv storage/logs/c.log storage/logs/c.log_$(date '+%Y%m%d%H%M%S%'| cut -b 1-17) \
