@@ -5,7 +5,7 @@ Server:
   ReadTimeout: 60
   WriteTimeout: 60
   #性能监听接口
-  PrivateHttpListen: localhost:8001
+  PrivateHttpListen: 127.0.0.1:8001
 App:
   DefaultPageSize: 10
   MaxPageSize: 100

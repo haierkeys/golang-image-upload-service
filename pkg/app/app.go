@@ -29,7 +29,9 @@ type ListRes struct {
 
 type ResResult struct {
 	// 业务状态码
-	Code interface{} `json:"code"`
+	Code int `json:"code"`
+	// 状态
+	Status bool `json:"status"`
 	// 失败&&成功消息
 	Msg interface{} `json:"message"`
 	// 数据集合
@@ -38,7 +40,9 @@ type ResResult struct {
 
 type ResListResult struct {
 	// 业务状态码
-	Code interface{} `json:"code"`
+	Code int `json:"code"`
+	// 状态
+	Status bool `json:"status"`
 	// 失败&&成功消息
 	Msg interface{} `json:"message"`
 	// 数据集合
@@ -47,7 +51,9 @@ type ResListResult struct {
 
 type ErrResult struct {
 	// 业务状态码
-	Code interface{} `json:"code"`
+	Code int `json:"code"`
+	// 状态
+	Status bool `json:"status"`
 	// 失败&&成功消息
 	Msg interface{} `json:"message"`
 	// 错误格式数据
@@ -105,23 +111,26 @@ func (r *Response) ToResponse(code *code.Code) {
 	if code.HaveDetails() {
 		r.SendResponse(code.StatusCode(), ErrResult{
 			Code:    code.Code(),
+			Status:  code.Status(),
 			Msg:     code.Msg(),
 			Data:    code.Data(),
 			Details: code.Details(),
 		})
 	} else {
 		r.SendResponse(code.StatusCode(), ResResult{
-			Code: code.Code(),
-			Msg:  code.Msg(),
-			Data: code.Data(),
+			Code:   code.Code(),
+			Status: code.Status(),
+			Msg:    code.Msg(),
+			Data:   code.Data(),
 		})
 	}
 }
 
 func (r *Response) ToResponseList(code *code.Code, list interface{}, totalRows int) {
 	r.SendResponse(code.StatusCode(), ResListResult{
-		Code: code.Code(),
-		Msg:  code.Msg(),
+		Code:   code.Code(),
+		Status: code.Status(),
+		Msg:    code.Msg(),
 		Data: ListRes{
 			List: list,
 			Pager: Pager{

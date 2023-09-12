@@ -6,15 +6,17 @@ import (
 )
 
 type Code struct {
-	// 错误码
+	// 状态码
 	code int
+	// 状态
+	status bool
 	// 错误消息
 	msg string
-	//数据
+	// 数据
 	data interface{}
 	// 错误详细信息
 	details []string
-	//是否含有详情
+	// 是否含有详情
 	haveDetails bool
 }
 
@@ -32,7 +34,7 @@ func NewError(code int, msg string) *Code {
 		maxcode = code
 	}
 
-	return &Code{code: code, msg: msg}
+	return &Code{code: code, status: false, msg: msg}
 }
 
 func incr(code int) int {
@@ -53,7 +55,7 @@ func NewSuss(code int, msg string) *Code {
 	if code > maxcode {
 		maxcode = code
 	}
-	return &Code{code: code, msg: msg}
+	return &Code{code: code, status: true, msg: msg}
 }
 
 func (e *Code) Error() string {
@@ -62,6 +64,10 @@ func (e *Code) Error() string {
 
 func (e *Code) Code() int {
 	return e.code
+}
+
+func (e *Code) Status() bool {
+	return e.status
 }
 
 func (e *Code) Msg() string {
