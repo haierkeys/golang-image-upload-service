@@ -1,8 +1,4 @@
 [中文文档](readme-zh.md)
-[English Document](README.md)
-
-[English Document](README.md)
-
 # Golang Image Upload Service
 
 Image upload/storage/synchronization service for the obsidian-auto-image-remote-uploader plugin.
