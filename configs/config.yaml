@@ -6,6 +6,8 @@ Server:
   WriteTimeout: 60
   #性能监听接口
   PrivateHttpListen:  :8001
+Security:
+  AuthToken: 6666
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
@@ -14,7 +16,7 @@ App:
   LogFileName: app
   LogFileExt: .log
   UploadSavePath: storage/uploads
-  # 上传附件访问地址
+  # 上传附件访问地址 这里用来描述接口返回给上传端使用的URL前缀
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
   UploadImageMaxSize: 5  # MB
   UploadImageAllowExts:
@@ -25,8 +27,6 @@ App:
     - .gif
     - .svg
     - .tiff
-Security:
-  AuthToken: 6666
 Email:
   Host: smtp.qq.com
   Port: 465
@@ -37,8 +37,9 @@ Email:
   To:
     - xxx
 OSS:
+  # 开启OSS云存储
+  Enable: false
   BucketName:
-  AccessURLDomain: https://.com/
   Endpoint:
   AccessKeyID:
-  AccessKeySecret :
+  AccessKeySecret:
