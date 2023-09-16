@@ -20,6 +20,7 @@ endif
 
 # These are the values we want to pass for Version and BuildTime
 GitTag	= $(shell git describe --tags)
+$(shell echo `git describe --tags`>VERSION)
 BuildTime=$(shell date +%FT%T%z)
 
 
