@@ -10,7 +10,6 @@ on:
 env:
   PLUGIN_NAME: golang-image-upload-service
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -27,24 +26,21 @@ jobs:
         mkdir -p ./build/linux/configs
         mkdir -p ./build/linux/storage/logs
         mkdir -p ./build/linux/storage/uploads
-        cp ./config/config.yaml ./build/linux/configs
-
+        cp ./configs/config.yaml ./build/linux/configs
     - name: build-windows
       run: |
         CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -o ./build/windows/image-api.exe
         mkdir -p ./build/windows/configs
         mkdir -p ./build/windows/storage/logs
         mkdir -p ./build/windows/storage/uploads
-        cp ./config/config.yaml ./build/windows/configs
-
+        cp ./configs/config.yaml ./build/windows/configs
     - name: build-macos
       run: |
         GOOS=darwin GOARCH=amd64 go build -o ./build/macos/image-api
         mkdir -p ./build/macos/configs
         mkdir -p ./build/macos/storage/logs
         mkdir -p ./build/macos/storage/uploads
-        cp ./config/config.yaml ./build/macos/configs
-
+        cp ./configs/config.yaml ./build/macos/configs
     - name: gzip-tar-all
       run: |
         tar -czvf ./build/image-api-windows.tar.gz -C ./build/windows/ .
