@@ -19,11 +19,11 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.21'
 
     - name: build-linux
       run: |
-        GOOS=linux GOARCH=amd64 go build ./main.go -o ./build/linux/image-api
+        GOOS=linux GOARCH=amd64 go build -o ./build/linux/image-api
         mkdir -p ./build/linux/configs
         mkdir -p ./build/linux/storage/logs
         mkdir -p ./build/linux/storage/uploads
@@ -31,7 +31,7 @@ jobs:
 
     - name: build-windows
       run: |
-        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build ./main.go -o ./build/windows/image-api.exe
+        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -o ./build/windows/image-api.exe
         mkdir -p ./build/windows/configs
         mkdir -p ./build/windows/storage/logs
         mkdir -p ./build/windows/storage/uploads
@@ -39,7 +39,7 @@ jobs:
 
     - name: build-macos
       run: |
-        GOOS=darwin GOARCH=amd64 go build main.go -o ./build/macos/image-api
+        GOOS=darwin GOARCH=amd64 go build -o ./build/macos/image-api
         mkdir -p ./build/macos/configs
         mkdir -p ./build/macos/storage/logs
         mkdir -p ./build/macos/storage/uploads
