@@ -62,7 +62,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload Linux GZip file
-      id: upload-linux-zip
+      id: upload-linux
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
         asset_name: ${{ env.PLUGIN_NAME }}-linux-${{ steps.build.outputs.tag_name }}.zip
         asset_content_type: application/gzip
     - name: Upload Windows GZip file
-      id: upload-windows-zip
+      id: upload-windows
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
         asset_content_type: application/gzip
 
     - name: Upload MacOS GZip file
-      id: upload-macos-zip
+      id: upload-macos
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
