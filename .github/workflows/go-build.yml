@@ -41,7 +41,8 @@ jobs:
         mkdir -p ./build/macos/storage/logs
         mkdir -p ./build/macos/storage/uploads
         cp ./configs/config.yaml ./build/macos/configs
-    - name: gzip-tar-all
+    - name: gzip
+      id: gzip
       run: |
         tar -czvf ./build/image-api-windows.tar.gz -C ./build/windows/ .
         tar -czvf ./build/image-api-macos.tar.gz -C ./build/macos/ .
@@ -65,7 +66,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./build/image-api-linux.tar.gz
-        asset_name: ${{ env.PLUGIN_NAME }}-linux-${{ steps.build.outputs.tag_name }}.zip
+        asset_name: ${{ env.PLUGIN_NAME }}-linux-${{ steps.gzip.outputs.tag_name }}.zip
         asset_content_type: application/gzip
     - name: Upload Windows GZip file
       id: upload-windows
@@ -75,7 +76,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./build/image-api-windows.tar.gz
-        asset_name: ${{ env.PLUGIN_NAME }}-windows-${{ steps.build.outputs.tag_name }}.zip
+        asset_name: ${{ env.PLUGIN_NAME }}-windows-${{ steps.gzip.outputs.tag_name }}.zip
         asset_content_type: application/gzip
 
     - name: Upload MacOS GZip file
@@ -86,5 +87,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./build/image-api-macos.tar.gz
-        asset_name: ${{ env.PLUGIN_NAME }}-macos-${{ steps.build.outputs.tag_name }}.zip
+        asset_name: ${{ env.PLUGIN_NAME }}-macos-${{ steps.gzip.outputs.tag_name }}.zip
         asset_content_type: application/gzip
