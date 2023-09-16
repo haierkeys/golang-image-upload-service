@@ -74,7 +74,7 @@ func main() {
 
 	if isVersion {
 		fmt.Println("Version: " + Version)
-		fmt.Printf("Git Tag: " + GitTag)
+		fmt.Println("Git Tag: " + GitTag)
 		fmt.Println("Build Time: " + BuildTime)
 		return
 	}

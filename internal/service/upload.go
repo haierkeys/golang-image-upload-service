@@ -4,8 +4,6 @@ import (
 	"mime/multipart"
 	"os"
 
-	"github.com/google/uuid"
-	"github.com/gookit/goutil/dump"
 	"github.com/pkg/errors"
 
 	"github.com/haierspi/golang-image-upload-service/global"
@@ -21,16 +19,8 @@ type FileInfo struct {
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
 
 	var accessUrlPre string
-	var fileName string
 
-	if fileHeader.Filename == "image.png" {
-		fileName = upload.GetFileName(uuid.New().String() + fileHeader.Filename)
-	} else {
-		fileName = upload.GetFileName(fileHeader.Filename)
-	}
-
-	dump.P(fileHeader.Filename)
-
+	fileName := upload.GetFileName(fileHeader.Filename)
 	if !upload.CheckContainExt(fileType, fileName) {
 		return nil, errors.New("file suffix is not supported.")
 	}
@@ -55,7 +45,7 @@ func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fi
 	accessUrlPre = global.AppSetting.UploadServerUrl
 
 	// 阿里云oss
-	if global.OSSSetting.Enable {
+	if global.OSSSetting.BucketName != "" {
 		err := oss.UploadByFile(dateDirFileName, file)
 		if err != nil {
 			return nil, errors.Wrap(err, "oss.UploadByFile err")
