@@ -60,7 +60,6 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Linux
-.*
 !.gitignore
 !.htaccess
 !.env
