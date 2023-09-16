@@ -84,10 +84,11 @@ type AlipaySettingS struct {
 
 // OSSSettingS struct
 type OSSSettingS struct {
+	// Enable
+	Enable bool
 	// BucketName is the name of the bucket
 	BucketName string
-	// AccessURLDomain is the access URL domain
-	AccessURLDomain string
+
 	// Endpoint is the endpoint of the OSS
 	Endpoint string
 	// AccessKeyID is the access key ID

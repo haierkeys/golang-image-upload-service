@@ -85,11 +85,11 @@ App:
   LogFileExt: .log
   # 图片文件存储地址
   UploadSavePath: storage/uploads
-  # 设置本地图片访问地址前缀,需要包含 UploadSavePath
+  # 上传附件访问地址,需要包含 UploadSavePath, 这里用来描述接口返回给上传端使用的URL前缀
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
   # 上传大小限制 单位MB
   UploadImageMaxSize: 5
-  # 图片限制
+  # 上传图片类型限制
   UploadImageAllowExts:
     - .jpg
     - .jpeg
@@ -100,10 +100,13 @@ App:
     - .tiff
 # 阿里云OSS
 OSS:
+  # 是否开启OSS云存储
+  Enable: false
   BucketName:
   Endpoint:
   AccessKeyID:
   AccessKeySecret:
+
 Email:
   Host: smtp.gmail.com
   Port: 465
@@ -113,7 +116,6 @@ Email:
   From: xxx
   To:
     - xxx
-
 ```
 ## TODO
 

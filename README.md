@@ -62,31 +62,31 @@ Configuration file path *. /configs/config.yaml*
 The default content is as follows
 
 ```yaml
-RunMode: debug
+Server:
   RunMode: debug
   # Service ports in the form IP:PORT (destined to listen on IP) or :PORT (listen on all)
-  HttpPort: :8000
+  HttpPort:  :8000
   ReadTimeout: 60
   WriteTimeout: 60
   # Performance Listening Interface
-  PrivateHttpListen: :8001
-PrivateHttpListen: :8001
+  PrivateHttpListen:  :8001
+Security:
   # Image Upload API Authorization TOKEN
   AuthToken: 6666
-App.
+App:
   DefaultPageSize: 10
   MaxPageSize: 100
   DefaultContextTimeout: 60
   LogSavePath: storage/logs
   LogFileName: app
   LogFileExt: .log
-  # Image file storage address
+  # Image file storage path
   UploadSavePath: storage/uploads
-  # Set the prefix of the local image access address, need to include UploadSavePath.
+  # Access address for uploading attachments, including UploadSavePath, which describes the URL prefix that the interface returns to the uploader.
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
-  # Upload size limit Unit MB
+  # Upload size limit; unit: MB
   UploadImageMaxSize: 5
-  # Image limit
+  # Upload Image File types limit
   UploadImageAllowExts:
     - .jpg
     - .jpeg
@@ -97,10 +97,13 @@ App.
     - .tiff
 # AliCloud OSS
 OSS:
+  # Whether to enable OSS cloud storage
+  Enable: false
   BucketName:
   Endpoint:
   AccessKeyID:
   AccessKeySecret:
+
 Email:
   Host: smtp.gmail.com
   Port: 465

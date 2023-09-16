@@ -1,11 +1,14 @@
 Server:
   RunMode: debug
-  #服务端口 正常只需要输入端口则监听所有IP
+  # 服务端口 格式为 IP:PORT (注定监听IP) 或者 :PORT (监听所有)
   HttpPort:  :8000
   ReadTimeout: 60
   WriteTimeout: 60
-  #性能监听接口
+  # 性能监听接口
   PrivateHttpListen:  :8001
+Security:
+  # 图片上传API授权TOKEN
+  AuthToken: 6666
 App:
   DefaultPageSize: 10
   MaxPageSize: 100
@@ -13,10 +16,13 @@ App:
   LogSavePath: storage/logs
   LogFileName: app
   LogFileExt: .log
+  # 图片文件存储地址
   UploadSavePath: storage/uploads
-  # 上传附件访问地址
+  # 上传附件访问地址,需要包含 UploadSavePath, 这里用来描述接口返回给上传端使用的URL前缀
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
-  UploadImageMaxSize: 5  # MB
+  # 上传大小限制 单位MB
+  UploadImageMaxSize: 5
+  # 上传图片类型限制
   UploadImageAllowExts:
     - .jpg
     - .jpeg
@@ -25,10 +31,17 @@ App:
     - .gif
     - .svg
     - .tiff
-Security:
-  AuthToken: 6666
+# 阿里云OSS
+OSS:
+  # 是否开启OSS云存储
+  Enable: false
+  BucketName:
+  Endpoint:
+  AccessKeyID:
+  AccessKeySecret:
+
 Email:
-  Host: smtp.qq.com
+  Host: smtp.gmail.com
   Port: 465
   UserName: xxx
   Password: xxx
@@ -36,9 +49,3 @@ Email:
   From: xxx
   To:
     - xxx
-OSS:
-  BucketName:
-  AccessURLDomain: https://.com/
-  Endpoint:
-  AccessKeyID:
-  AccessKeySecret :
