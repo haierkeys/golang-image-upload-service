@@ -5,8 +5,8 @@ name: Go
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [ "main" ]
+
 env:
   PLUGIN_NAME: golang-image-upload-service
 jobs:
