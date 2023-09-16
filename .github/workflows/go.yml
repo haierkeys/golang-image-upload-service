@@ -5,8 +5,8 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
-
+    tags:
+      - "*"
 env:
   PLUGIN_NAME: golang-image-upload-service
 jobs:
@@ -62,7 +62,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload Linux GZip file
-      id: upload-zip
+      id: upload-linux-zip
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
         asset_name: ${{ env.PLUGIN_NAME }}-linux-${{ steps.build.outputs.tag_name }}.zip
         asset_content_type: application/gzip
     - name: Upload Windows GZip file
-      id: upload-zip
+      id: upload-windows-zip
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
         asset_content_type: application/gzip
 
     - name: Upload MacOS GZip file
-      id: upload-zip
+      id: upload-macos-zip
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
