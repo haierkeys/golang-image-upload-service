@@ -1,11 +1,12 @@
 package service
 
 import (
+	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/gookit/goutil/dump"
 	"github.com/pkg/errors"
 
 	"github.com/haierspi/golang-image-upload-service/global"
@@ -19,17 +20,49 @@ type FileInfo struct {
 }
 
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
+	return svc.fileSyncHandle(fileType, file, fileHeader)
+}
+
+func (svc *Service) UploadFileByURL(fileType upload.FileType, url string) (*FileInfo, error) {
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	file, err := os.Create(uuid.New().String() + upload.GetFileExt(url))
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	muFile, fileHeader, err := upload.FileToMultipart(file)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return svc.fileSyncHandle(fileType, muFile, fileHeader)
+
+}
+
+func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
 
 	var accessUrlPre string
 	var fileName string
 
+	// 通过剪切板上传的附件 都是一个默认名字
 	if fileHeader.Filename == "image.png" {
 		fileName = upload.GetFileName(uuid.New().String() + fileHeader.Filename)
 	} else {
 		fileName = upload.GetFileName(fileHeader.Filename)
 	}
-
-	dump.P(fileHeader.Filename)
 
 	if !upload.CheckContainExt(fileType, fileName) {
 		return nil, errors.New("file suffix is not supported.")

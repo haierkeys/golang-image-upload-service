@@ -16,21 +16,31 @@ func NewUpload() Upload {
 	return Upload{}
 }
 
-func (u Upload) UploadFile(c *gin.Context) {
+func (u Upload) Upload(c *gin.Context) {
+
+	var svcUploadFileData *service.FileInfo
+	var svc = service.New(c.Request.Context())
+	var err error
+
 	response := app.NewResponse(c)
-	file, fileHeader, err := c.Request.FormFile("imagefile")
 
-	defer file.Close()
+	name := c.Request.FormValue("name")
 
-	// dump.P(file)
+	if name != "" {
+		svcUploadFileData, err = svc.UploadFileByURL(upload.TypeImage, name)
+	} else {
+		file, fileHeader, errf := c.Request.FormFile("imagefile")
+		defer file.Close()
 
-	if err != nil {
-		response.ToResponse(code.ErrorInvalidParams.WithDetails(err.Error()))
-		return
+		// dump.P(file)
+
+		if errf != nil {
+			response.ToResponse(code.ErrorInvalidParams.WithDetails(errf.Error()))
+			return
+		}
+		svcUploadFileData, err = svc.UploadFile(upload.TypeImage, file, fileHeader)
 	}
 
-	svc := service.New(c.Request.Context())
-	svcUploadFileData, err := svc.UploadFile(upload.TypeImage, file, fileHeader)
 	if err != nil {
 		global.Logger.Errorf(c, "svc.UploadFile err: %v", err)
 		response.ToResponse(code.ErrorUploadFileFail.WithDetails(err.Error()))
@@ -38,6 +48,7 @@ func (u Upload) UploadFile(c *gin.Context) {
 	}
 
 	response.ToResponse(code.Success.WithData(svcUploadFileData))
+
 	return
 
 }

@@ -24,6 +24,18 @@ func GetFileName(name string) string {
 	return fileName + ext
 }
 
+func FileToMultipart(file *os.File) (multipart.File, *multipart.FileHeader, error) {
+
+	// 将 *os.File 对象转换为 multipart.File 类型
+	fileInfo, _ := file.Stat()
+	return file, &multipart.FileHeader{
+		Filename: fileInfo.Name(),
+		Size:     fileInfo.Size(),
+		// ModTime:  fileInfo.ModTime(),
+		// 如果还需要其他属性，可以根据实际情况进行设置
+	}, nil
+}
+
 func GetFileExt(name string) string {
 	return path.Ext(name)
 }

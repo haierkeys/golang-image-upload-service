@@ -31,6 +31,9 @@ App:
     - .gif
     - .svg
     - .tiff
+    - .heif
+    - .avif
+    - .webp
 # 阿里云OSS
 OSS:
   # 是否开启OSS云存储

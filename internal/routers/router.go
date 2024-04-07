@@ -49,22 +49,22 @@ func NewRouter() *gin.Engine {
 		r.Use(middleware.AccessLog())
 		r.Use(middleware.Recovery())
 	}
-	//对404 的处理
+	// 对404 的处理
 	r.NoRoute(middleware.NoFound())
 	//	r.Use(middleware.Tracing())
 	r.Use(middleware.RateLimiter(methodLimiters))
 	r.Use(middleware.ContextTimeout(global.AppSetting.DefaultContextTimeout))
 	r.Use(middleware.Translations())
 	r.Use(middleware.Cors())
-	//r.Use(middleware.AuthToken())
+	// r.Use(middleware.AuthToken())
 
 	r.GET("/debug/vars", api.Expvar)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	upload := api.NewUpload()
-	r.Group("/api").Use(middleware.AuthToken()).POST("/upload", upload.UploadFile)
+	r.Group("/api").Use(middleware.AuthToken()).POST("/upload", upload.Upload)
 
-	//r.Use(middleware.AuthToken()).POST("/upload", upload.UploadFile)
+	// r.Use(middleware.AuthToken()).POST("/upload", upload.UploadFile)
 
 	r.StaticFS(global.AppSetting.UploadSavePath, http.Dir(global.AppSetting.UploadSavePath))
 
