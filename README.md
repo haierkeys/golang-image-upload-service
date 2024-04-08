@@ -82,6 +82,7 @@ App:
   LogFileExt: .log
   # Image file storage path
   UploadSavePath: storage/uploads
+  TempPath: storage/temp
   # Access address for uploading attachments, including UploadSavePath, which describes the URL prefix that the interface returns to the uploader.
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
   # Upload size limit; unit: MB

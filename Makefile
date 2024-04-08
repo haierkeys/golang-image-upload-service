@@ -97,7 +97,7 @@ clean:
 
 push-online:  build-linux
 	$(call dockerImageClean)
-	docker build -t  $(RemoteDockerHub)/$(projectName):latest -f Dockerfile .
+	docker build --platform linux/amd64  -t  $(RemoteDockerHub)/$(projectName):latest -f Dockerfile .
 	docker tag  $(RemoteDockerHub)/$(projectName):latest $(RemoteDockerHub)/$(projectName):$(ReleaseTagPre)$(GitTag)
 
 	docker push $(RemoteDockerHub)/$(projectName):$(ReleaseTagPre)$(GitTag)
@@ -106,7 +106,7 @@ push-online:  build-linux
 
 push-dev:  build-linux
 	$(call dockerImageClean)
-	docker build -t $(RemoteDockerHub)/$(projectName):dev-latest -f Dockerfile .
+	docker build --platform linux/amd64 -t $(RemoteDockerHub)/$(projectName):dev-latest -f Dockerfile .
 	docker tag $(RemoteDockerHub)/$(projectName):dev-latest $(RemoteDockerHub)/$(projectName):$(DevelopTagPre)$(GitTag)
 
 	docker push $(RemoteDockerHub)/$(projectName):$(DevelopTagPre)$(GitTag)

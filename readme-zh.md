@@ -85,6 +85,7 @@ App:
   LogFileExt: .log
   # 图片文件存储地址
   UploadSavePath: storage/uploads
+  TempPath: storage/temp
   # 上传附件访问地址,需要包含 UploadSavePath, 这里用来描述接口返回给上传端使用的URL前缀
   UploadServerUrl: http://127.0.0.1:8000/storage/uploads
   # 上传大小限制 单位MB
