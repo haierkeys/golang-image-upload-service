@@ -61,6 +61,7 @@ build:
 	cp $(cfgDir)/config.yaml $(buildDir)/configs
 	mkdir -p $(buildDir)/storage/logs
 	mkdir -p $(buildDir)/storage/uploads
+	mkdir -p $(buildDir)/storage/temp
 
 build-all:
 #	$(call checkStatic)
@@ -122,6 +123,7 @@ build-macos:
 	cp $(cfgDir)/config.yaml $(buildDir)/macos/configs
 	mkdir -p $(buildDir)/macos/storage/logs
 	mkdir -p $(buildDir)/macos/storage/uploads
+	mkdir -p $(buildDir)/linux/storage/temp
 
 build-linux:
 	$(call init)
@@ -133,6 +135,7 @@ build-linux:
 	cp $(cfgDir)/config.yaml $(buildDir)/linux/configs
 	mkdir -p $(buildDir)/linux/storage/logs
 	mkdir -p $(buildDir)/linux/storage/uploads
+	mkdir -p $(buildDir)/linux/storage/temp
 
 
 build-windows:
@@ -145,7 +148,7 @@ build-windows:
 	cp $(cfgDir)/config.yaml $(buildDir)/windows/configs
 	mkdir -p $(buildDir)/windows/storage/logs
 	mkdir -p $(buildDir)/windows/storage/uploads
-
+	mkdir -p $(buildDir)/linux/storage/temp
 
 
 
