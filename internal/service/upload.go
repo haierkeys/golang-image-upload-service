@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/gookit/goutil/dump"
 	"github.com/pkg/errors"
 
 	"github.com/haierspi/golang-image-upload-service/global"
@@ -31,11 +32,25 @@ func (svc *Service) UploadFileByURL(fileType upload.FileType, url string) (*File
 	}
 	defer resp.Body.Close()
 
-	file, err := os.Create(uuid.New().String() + upload.GetFileExt(url))
+	uploadTempPath := upload.GetTempPath() + "/uploads"
+
+	uploadTempFile := uploadTempPath + "/" + uuid.New().String() + upload.GetFileExt(url)
+
+	if upload.CheckPath(uploadTempPath) {
+		if err := upload.CreatePath(uploadTempPath, os.ModePerm); err != nil {
+			return nil, errors.New("failed to create save directory.")
+		}
+	}
+	if upload.CheckPermission(uploadTempPath) {
+		return nil, errors.New("insufficient file permissions.")
+	}
+
+	file, err := os.Create(uploadTempFile)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
+	defer os.Remove(uploadTempFile)
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
@@ -43,10 +58,6 @@ func (svc *Service) UploadFileByURL(fileType upload.FileType, url string) (*File
 	}
 
 	muFile, fileHeader, err := upload.FileToMultipart(file)
-
-	if err != nil {
-		return nil, err
-	}
 
 	return svc.fileSyncHandle(fileType, muFile, fileHeader)
 
@@ -72,8 +83,8 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 	}
 
 	uploadSavePath := upload.GetSavePath()
-	if upload.CheckSavePath(uploadSavePath) {
-		if err := upload.CreateSavePath(uploadSavePath, os.ModePerm); err != nil {
+	if upload.CheckPath(uploadSavePath) {
+		if err := upload.CreatePath(uploadSavePath, os.ModePerm); err != nil {
 			return nil, errors.New("failed to create save directory.")
 		}
 	}
@@ -82,9 +93,12 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 	}
 
 	dateDirFileName := upload.GetSavePreDirPath() + fileName
-	if err := upload.SaveFile(fileHeader, uploadSavePath+"/"+dateDirFileName); err != nil {
+
+	if err := upload.SaveFile(file, uploadSavePath+"/"+dateDirFileName); err != nil {
+		dump.P(err)
 		return nil, err
 	}
+
 	accessUrlPre = global.AppSetting.UploadServerUrl
 
 	// 阿里云oss
@@ -97,5 +111,5 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
 	accessUrl := accessUrlPre + "/" + dateDirFileName
 
-	return &FileInfo{ImageTitle: "", ImageUrl: accessUrl}, nil
+	return &FileInfo{ImageTitle: fileHeader.Filename, ImageUrl: accessUrl}, nil
 }

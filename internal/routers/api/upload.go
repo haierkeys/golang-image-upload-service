@@ -16,29 +16,26 @@ func NewUpload() Upload {
 	return Upload{}
 }
 
+// Upload 上传文件
 func (u Upload) Upload(c *gin.Context) {
 
 	var svcUploadFileData *service.FileInfo
 	var svc = service.New(c.Request.Context())
 	var err error
+	var name string
 
 	response := app.NewResponse(c)
 
-	name := c.Request.FormValue("name")
-
-	if name != "" {
+	file, fileHeader, errf := c.Request.FormFile("imagefile")
+	if errf == nil {
+		defer file.Close()
+		svcUploadFileData, err = svc.UploadFile(upload.TypeImage, file, fileHeader)
+	} else if name = c.Request.FormValue("name"); name != "" {
 		svcUploadFileData, err = svc.UploadFileByURL(upload.TypeImage, name)
 	} else {
-		file, fileHeader, errf := c.Request.FormFile("imagefile")
-		defer file.Close()
-
-		// dump.P(file)
-
-		if errf != nil {
-			response.ToResponse(code.ErrorInvalidParams.WithDetails(errf.Error()))
-			return
-		}
-		svcUploadFileData, err = svc.UploadFile(upload.TypeImage, file, fileHeader)
+		global.Logger.Errorf(c, "app.ErrorInvalidParams len 0:")
+		response.ToResponse(code.ErrorInvalidParams)
+		return
 	}
 
 	if err != nil {

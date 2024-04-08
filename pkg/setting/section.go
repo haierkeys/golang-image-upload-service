@@ -33,6 +33,8 @@ type AppSettingS struct {
 	LogFileExt string
 	// 上传保存路径
 	UploadSavePath string
+	// 上传临时路径
+	TempPath string
 	// 上传服务器URL
 	UploadServerUrl string
 	// 上传图片最大尺寸

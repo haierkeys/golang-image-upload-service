@@ -44,6 +44,10 @@ func GetSavePath() string {
 	return global.AppSetting.UploadSavePath
 }
 
+func GetTempPath() string {
+	return global.AppSetting.TempPath
+}
+
 func GetSavePreDirPath() string {
 
 	getYearMonth := time.Now().Format("200601")
@@ -53,12 +57,6 @@ func GetSavePreDirPath() string {
 
 func GetServerUrl() string {
 	return global.AppSetting.UploadServerUrl
-}
-
-func CheckSavePath(dst string) bool {
-	_, err := os.Stat(dst)
-
-	return os.IsNotExist(err)
 }
 
 func CheckContainExt(t FileType, name string) bool {
@@ -94,7 +92,12 @@ func CheckPermission(dst string) bool {
 	return os.IsPermission(err)
 }
 
-func CreateSavePath(dst string, perm os.FileMode) error {
+func CheckPath(dst string) bool {
+	_, err := os.Stat(dst)
+	return os.IsNotExist(err)
+}
+
+func CreatePath(dst string, perm os.FileMode) error {
 	err := os.MkdirAll(dst, perm)
 	if err != nil {
 		return err
@@ -103,14 +106,9 @@ func CreateSavePath(dst string, perm os.FileMode) error {
 	return nil
 }
 
-func SaveFile(file *multipart.FileHeader, dst string) error {
-	src, err := file.Open()
-	if err != nil {
-		return err
-	}
-	defer src.Close()
+func SaveFile(file multipart.File, dst string) error {
 
-	err = os.MkdirAll(path.Dir(dst), os.ModePerm)
+	err := os.MkdirAll(path.Dir(dst), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -121,6 +119,7 @@ func SaveFile(file *multipart.FileHeader, dst string) error {
 	}
 	defer out.Close()
 
-	_, err = io.Copy(out, src)
+	file.Seek(0, 0)
+	_, err = io.Copy(out, file)
 	return err
 }
