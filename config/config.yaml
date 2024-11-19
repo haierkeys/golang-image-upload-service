@@ -57,9 +57,9 @@ cloudflu-r2:
   enable: true
   custom-path: blog
   bucket-name: image
-  account-id: b0687bc3002ca1c3e0f4456fe2dee226
-  access-key-id: 6f0a60b4fa6c915062c80501aaf72ebd
-  access-key-secret: b5b98a3a7ca53eef975fb8f5876ce91eda3e3c17b8dd60b48aa05e7e217d4b14
+  account-id:
+  access-key-id:
+  access-key-secret: 
 
 email:
   error-report-enable: false
