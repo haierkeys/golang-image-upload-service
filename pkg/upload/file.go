@@ -3,13 +3,13 @@ package upload
 import (
 	"io"
 	"mime/multipart"
+	"net/url"
 	"os"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/haierspi/golang-image-upload-service/global"
-	"github.com/haierspi/golang-image-upload-service/pkg/util"
 )
 
 type FileType int
@@ -19,7 +19,7 @@ const TypeImage FileType = iota + 1
 func GetFileName(name string) string {
 	ext := GetFileExt(name)
 	fileName := strings.TrimSuffix(name, ext)
-	fileName = util.EncodeMD5(fileName)
+	// fileName = util.EncodeMD5(fileName)
 
 	return fileName + ext
 }
@@ -41,11 +41,11 @@ func GetFileExt(name string) string {
 }
 
 func GetSavePath() string {
-	return global.AppSetting.UploadSavePath
+	return global.Config.LocalFS.SavePath
 }
 
 func GetTempPath() string {
-	return global.AppSetting.TempPath
+	return global.Config.App.TempPath
 }
 
 func GetSavePreDirPath() string {
@@ -55,8 +55,22 @@ func GetSavePreDirPath() string {
 	return getYearMonth + "/" + getDay + "/"
 }
 
+func UrlEscape(fileKey string) string {
+
+	if strings.Contains(fileKey, "/") {
+
+		i := strings.LastIndex(fileKey, "/")
+
+		fileKey = fileKey[:i+1] + url.PathEscape(fileKey[i+1:])
+	} else {
+		fileKey = url.PathEscape(fileKey)
+	}
+
+	return fileKey
+}
+
 func GetServerUrl() string {
-	return global.AppSetting.UploadServerUrl
+	return global.Config.App.UploadUrlPre
 }
 
 func CheckContainExt(t FileType, name string) bool {
@@ -64,7 +78,7 @@ func CheckContainExt(t FileType, name string) bool {
 	ext = strings.ToUpper(ext)
 	switch t {
 	case TypeImage:
-		for _, allowExt := range global.AppSetting.UploadImageAllowExts {
+		for _, allowExt := range global.Config.App.UploadAllowExts {
 			if strings.ToUpper(allowExt) == ext {
 				return true
 			}
@@ -78,7 +92,7 @@ func CheckMaxSize(t FileType, f multipart.File) bool {
 	size := len(content)
 	switch t {
 	case TypeImage:
-		if size >= global.AppSetting.UploadImageMaxSize*1024*1024 {
+		if size >= global.Config.App.UploadMaxSize*1024*1024 {
 			return true
 		}
 	}

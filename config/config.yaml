@@ -1,0 +1,73 @@
+server:
+  run-mode:
+  # 服务端口-格式为-ip:port (注定监听ip) 或者 :port (监听所有)
+  http-port:  :8000
+  read-timeout: 60
+  write-timeout: 60
+  # 性能监听接口
+  private-http-listen:  :8001
+security:
+  # 图片上传api授权token
+  auth-token: 6666
+
+app:
+  default-page-size: 10
+  max-page-size: 100
+  default-context-timeout: 60
+  log-save-path: storage/logs
+  log-file: app.log
+
+  temp-path: storage/temp
+  # 接口返回上传前缀地址
+  upload-url-pre: https://image.diybeta.com
+  # 上传大小限制-单位mb
+  upload-max-size: 5
+  # 上传图片类型限制
+  upload-allow-exts:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .gif
+    - .svg
+    - .tiff
+    - .heif
+    - .avif
+    - .webp
+# 本地存储
+local-fs:
+  enable: true
+  # 是否启用内置的文件URL访问服务
+  httpfs-enable: true
+  save-path: storage/uploads
+
+
+# 阿里云oss
+oss:
+  # 是否开启oss云存储
+  enable: false
+  custom-path: blog
+  bucket-name:
+  endpoint:
+  access-key-id:
+  access-key-secret:
+
+cloudflu-r2:
+  # 是否开启R2云存储
+  enable: true
+  custom-path: blog
+  bucket-name: image
+  account-id: b0687bc3002ca1c3e0f4456fe2dee226
+  access-key-id: 6f0a60b4fa6c915062c80501aaf72ebd
+  access-key-secret: b5b98a3a7ca53eef975fb8f5876ce91eda3e3c17b8dd60b48aa05e7e217d4b14
+
+email:
+  error-report-enable: false
+  host: smtp.gmail.com
+  port: 465
+  user-name: xxx
+  password: xxx
+  is-ssl: true
+  from: xxx
+  to:
+    - xxx

@@ -35,19 +35,19 @@
 docker pull haierspi/golang-image-upload-service:latest
 
 # 创建项目运行必要目录
-mkdir -p /data/image-api/configs
+mkdir -p /data/image-api/config
 mkdir -p /data/image-api/storage/logs
 mkdir -p /data/image-api/storage/uploads
 
 # 下载默认配置到配置文件目录内
-wget https://raw.githubusercontent.com/haierspi/golang-image-upload-service/main/configs/config.yaml  -O /data/configs/config.yaml
+wget https://raw.githubusercontent.com/haierspi/golang-image-upload-service/main/configs/config.yaml  -O /data/config/config.yaml
 
 # 创建&启动容器
 docker run -tid --name image-api \
         -p 8000:8000 -p 8001:8001 \
         -v /data/image-api/storage/logs/:/api/storage/logs/ \
         -v /data/image-api/storage/uploads/:/api/storage/uploads/ \
-        -v /data/image-api/configs/:/api/configs/ \
+        -v /data/image-api/config/:/api/config/ \
         haierspi/golang-image-upload-service:latest
 
 ```

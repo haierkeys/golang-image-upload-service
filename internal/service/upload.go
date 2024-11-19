@@ -7,10 +7,11 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/gookit/goutil/dump"
 	"github.com/pkg/errors"
 
 	"github.com/haierspi/golang-image-upload-service/global"
+	"github.com/haierspi/golang-image-upload-service/pkg/cloudflare_r2"
+	"github.com/haierspi/golang-image-upload-service/pkg/local_fs"
 	"github.com/haierspi/golang-image-upload-service/pkg/oss"
 	"github.com/haierspi/golang-image-upload-service/pkg/upload"
 )
@@ -18,6 +19,11 @@ import (
 type FileInfo struct {
 	ImageTitle string `json:"imageTitle"`
 	ImageUrl   string `json:"imageUrl"`
+}
+
+type Uploader interface {
+	SendFile(pathKey string, f multipart.File, h *multipart.FileHeader) (string, error)
+	SendContent(pathKey string, content []byte) (string, error)
 }
 
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
@@ -65,8 +71,9 @@ func (svc *Service) UploadFileByURL(fileType upload.FileType, url string) (*File
 
 func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
 
-	var accessUrlPre string
 	var fileName string
+
+	// dump.P(fileHeader)
 
 	// 通过剪切板上传的附件 都是一个默认名字
 	if fileHeader.Filename == "image.png" {
@@ -82,34 +89,45 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 		return nil, errors.New("exceeded maximum file limit.")
 	}
 
-	uploadSavePath := upload.GetSavePath()
-	if upload.CheckPath(uploadSavePath) {
-		if err := upload.CreatePath(uploadSavePath, os.ModePerm); err != nil {
-			return nil, errors.New("failed to create save directory.")
+	fileKey := upload.GetSavePreDirPath() + fileName
+
+	var up = make(map[string]Uploader)
+
+	var dstFileKey string
+
+	for _, v := range []string{"local_fs", "oss", "cloudflare_r2"} {
+
+		if v == "local_fs" && global.Config.LocalFS.Enable {
+
+			up[v] = new(local_fs.LocalFS)
+
+		} else if v == "oss" && global.Config.OSS.Enable {
+
+			c, _ := oss.NewClient()
+			up[v] = &oss.OSS{
+				Client: c,
+			}
+
+		} else if v == "cloudflare_r2" && global.Config.CloudfluR2.Enable {
+
+			c, _ := cloudflare_r2.NewClient()
+
+			up[v] = &cloudflare_r2.R2{
+				S3Client: c,
+			}
+
+		} else {
+			continue
 		}
-	}
-	if upload.CheckPermission(uploadSavePath) {
-		return nil, errors.New("insufficient file permissions.")
-	}
-
-	dateDirFileName := upload.GetSavePreDirPath() + fileName
-
-	if err := upload.SaveFile(file, uploadSavePath+"/"+dateDirFileName); err != nil {
-		dump.P(err)
-		return nil, err
-	}
-
-	accessUrlPre = global.AppSetting.UploadServerUrl
-
-	// 阿里云oss
-	if global.OSSSetting.Enable {
-		err := oss.UploadByFile(dateDirFileName, file)
+		var err error
+		dstFileKey, err = up[v].SendFile(fileKey, file, fileHeader)
 		if err != nil {
-			return nil, errors.Wrap(err, "oss.UploadByFile err")
+			return nil, err
 		}
+
 	}
 
-	accessUrl := accessUrlPre + "/" + dateDirFileName
+	accessUrl := global.Config.App.UploadUrlPre + "/" + upload.UrlEscape(dstFileKey)
 
 	return &FileInfo{ImageTitle: fileHeader.Filename, ImageUrl: accessUrl}, nil
 }

@@ -27,9 +27,11 @@ func (u Upload) Upload(c *gin.Context) {
 	response := app.NewResponse(c)
 
 	file, fileHeader, errf := c.Request.FormFile("imagefile")
+
 	if errf == nil {
 		defer file.Close()
 		svcUploadFileData, err = svc.UploadFile(upload.TypeImage, file, fileHeader)
+
 	} else if name = c.Request.FormValue("name"); name != "" {
 		svcUploadFileData, err = svc.UploadFileByURL(upload.TypeImage, name)
 	} else {

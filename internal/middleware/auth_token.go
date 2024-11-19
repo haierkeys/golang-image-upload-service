@@ -8,6 +8,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/haierspi/golang-image-upload-service/global"
 	"github.com/haierspi/golang-image-upload-service/pkg/app"
 	"github.com/haierspi/golang-image-upload-service/pkg/code"
@@ -16,7 +17,7 @@ import (
 func AuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		if global.SecuritySetting.AuthToken == "" {
+		if global.Config.Security.AuthToken == "" {
 			c.Next()
 		}
 
@@ -34,7 +35,7 @@ func AuthToken() gin.HandlerFunc {
 			token = s
 		}
 
-		if token != global.SecuritySetting.AuthToken {
+		if token != global.Config.Security.AuthToken {
 			response.ToResponse(code.ErrorInvalidAuthToken)
 			c.Abort()
 		}
