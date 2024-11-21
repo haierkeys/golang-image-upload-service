@@ -81,8 +81,8 @@ https://github.com/haierkeys/obsidian-image-api-gateway/releases 下载最新版
 
 配置详情参阅:
 
-[配置文件-中文注释](config\config.yaml)
-[配置文件-英文注释](config\config-en.yaml)
+[配置文件-中文注释](config/config.yaml)
+[配置文件-英文注释](config/config-en.yaml)
 
 ## TODO
 

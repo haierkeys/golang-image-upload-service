@@ -77,7 +77,7 @@ The default configuration file name is `_config.yaml_`, which should be located 
 
 For detailed configuration instructions, refer to:
 
-- [Configuration File with English Comments](config\config-en.yaml)
+- [Configuration File with English Comments](config/config-en.yaml)
 
 
 ## TODO
