@@ -21,13 +21,13 @@ endif
 # These are the values we want to pass for Version and BuildTime
 # GitTag	= $(shell git describe --tags)
 GitTag	= $(shell git describe --tags --abbrev=0)
-$(shell echo `git describe --tags --abbrev=0`>VERSION)
 BuildTime=$(shell date +%FT%T%z)
 
 
 # Go parameters
 goCmd	=	go
-version	=	$(shell cat VERSION)
+
+
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X global.GitTag=$(GitTag) -X global.BuildTime=$(BuildTime)"
