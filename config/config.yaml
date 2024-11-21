@@ -46,20 +46,29 @@ local-fs:
 oss:
   # 是否开启oss云存储
   enable: false
-  custom-path: blog
-  bucket-name:
   endpoint:
+  bucket-name:
   access-key-id:
   access-key-secret:
+  custom-path: blog
 
 cloudflu-r2:
   # 是否开启R2云存储
-  enable: true
-  custom-path: blog
+  enable: false
   bucket-name: image
   account-id:
   access-key-id:
-  access-key-secret: 
+  access-key-secret:
+  custom-path: blog
+
+aws-s3:
+  # AWS S3
+  enable: false
+  region:
+  bucket-name:
+  access-key-id:
+  access-key-secret:
+  custom-path: blog
 
 email:
   error-report-enable: false

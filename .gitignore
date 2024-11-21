@@ -78,3 +78,5 @@ Icon
 /build
 /storage/logs
 /storage/uploads
+/storage/
+/config/config-dev.yaml
