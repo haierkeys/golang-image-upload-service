@@ -27,7 +27,7 @@ jobs:
         echo "TIME=$TIME" >> $GITHUB_ENV
 
     - name: Get Tag Version
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: build-linux
       run: |
@@ -38,8 +38,7 @@ jobs:
         cp ./config/config.yaml ./build/linux/config
     - name: build-windows
       run: |
-
-        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -X global.GitTag=${{ env.RELEASE_VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/windows/image-api.exe
+        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -X global.GitTag=${{ env.RELEASE_VERSION }} -X global.BuildTime=${{ env.TIME }} -o ./build/windows/image-api.exe
         mkdir -p ./build/windows/config
         mkdir -p ./build/windows/storage/logs
         mkdir -p ./build/windows/storage/uploads
