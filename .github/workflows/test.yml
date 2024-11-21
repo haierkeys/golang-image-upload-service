@@ -18,12 +18,8 @@ jobs:
 
 
     - name: Set Time
-      run: |
-        TIME="$(TZ='Asia/Shanghai' date +'%FT%T%z')"
-        echo "TIME=$TIME" >> $GITHUB_ENV
-
+      run: echo "TIME=`$(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
     - name: Get Tag Version
-      run: |
-        echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
-        echo ${{ env.TAG_VERSION }}
-
+      run: echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+    - name: Echo Version
+      run: echo ${{ env.TAG_VERSION }} ${{ env.TIME }}
