@@ -1,5 +1,5 @@
 FROM alpine:latest
-ENV TZ Asia/Shanghai
+ENV TZ=Asia/Shanghai
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk --update add libstdc++ curl ca-certificates bash curl gcompat tzdata && \
   cp /usr/share/zoneinfo/${TZ} /etc/localtime && \

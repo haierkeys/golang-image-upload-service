@@ -6,8 +6,8 @@ include .env
 
 RemoteDockerHub = haierkeys
 
-ReleaseTagPre = release-v-
-DevelopTagPre = develop-v-
+ReleaseTagPre = release-v
+DevelopTagPre = develop-v
 
 
 platform = $(shell uname -m)
