@@ -14,10 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.23'
 
     - name: Set Time
       run: |
@@ -30,3 +26,8 @@ jobs:
     - name: build-linux
       run: |
         echo ${{ env.RELEASE_VERSION }}   ${{ env.TIME }}
+    - name: Get version1
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Echo Version
+      run: echo ${{ steps.get_version.outputs.VERSION }}
