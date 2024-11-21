@@ -5,7 +5,6 @@ import (
     "context"
     "fmt"
     "mime/multipart"
-    "strings"
     "time"
 
     "github.com/aws/aws-sdk-go-v2/aws"
@@ -15,6 +14,7 @@ import (
     "github.com/pkg/errors"
 
     "github.com/haierspi/golang-image-upload-service/global"
+    pkg_path "github.com/haierspi/golang-image-upload-service/pkg/path"
 )
 
 type R2 struct {
@@ -38,11 +38,7 @@ func (p *R2) SendFile(fileKey string, file multipart.File, h *multipart.FileHead
     ctx := context.Background()
     bucket := p.GetBucket("")
 
-    if strings.HasSuffix(global.Config.CloudfluR2.CustomPath, "/") {
-        fileKey = global.Config.CloudfluR2.CustomPath + fileKey
-    } else {
-        fileKey = global.Config.CloudfluR2.CustomPath + "/" + fileKey
-    }
+    fileKey = pkg_path.PathSuffixCheckAdd(global.Config.CloudfluR2.CustomPath, "/") + fileKey
 
     k, _ := h.Open()
 
@@ -65,11 +61,7 @@ func (p *R2) SendContent(fileKey string, content []byte) (string, error) {
     ctx := context.Background()
     bucket := p.GetBucket("")
 
-    if strings.HasSuffix(global.Config.CloudfluR2.CustomPath, "/") {
-        fileKey = global.Config.CloudfluR2.CustomPath + fileKey
-    } else {
-        fileKey = global.Config.CloudfluR2.CustomPath + "/" + fileKey
-    }
+    fileKey = pkg_path.PathSuffixCheckAdd(global.Config.CloudfluR2.CustomPath, "/") + fileKey
 
     input := &s3.PutObjectInput{
         Bucket:            aws.String(bucket),

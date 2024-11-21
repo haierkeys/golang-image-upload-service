@@ -14,6 +14,7 @@ import (
     "github.com/haierspi/golang-image-upload-service/pkg/cloudflare_r2"
     "github.com/haierspi/golang-image-upload-service/pkg/local_fs"
     "github.com/haierspi/golang-image-upload-service/pkg/oss"
+    pkg_path "github.com/haierspi/golang-image-upload-service/pkg/path"
     "github.com/haierspi/golang-image-upload-service/pkg/upload"
 )
 
@@ -134,7 +135,7 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
     }
 
-    accessUrl := global.Config.App.UploadUrlPre + "/" + upload.UrlEscape(dstFileKey)
+    accessUrl := pkg_path.PathSuffixCheckAdd(global.Config.App.UploadUrlPre, "/") + upload.UrlEscape(dstFileKey)
 
     return &FileInfo{ImageTitle: fileHeader.Filename, ImageUrl: accessUrl}, nil
 }
