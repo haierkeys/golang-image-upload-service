@@ -22,18 +22,18 @@ jobs:
             goos: windows
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set Time
-        run: |
-          TIME="$(TZ='Asia/Shanghai' date +'%FT%T%z')"
-          echo "TIME=$TIME" >> $GITHUB_ENV
+        run: echo "TIME=`echo $(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
       - name: Get Tag Version
-        run: echo "RELEASE_VERSION=${GITHUB_REF/refs/tags/*}" >> $GITHUB_ENV
+        run: echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
       - uses: wangyoucao577/go-release-action@v1.30
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # 一个默认的变量，用来实现往 Release 中添加文件
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          ldflags: -X global.GitTag=${{ env.RELEASE_VERSION }} -X global.BuildTime=${{ env.TIME }}
+          ldflags: -X global.GitTag=${{ env.TAG_VERSION }} -X global.BuildTime=${{ env.TIME }}
           goversion: 1.23 # 可以指定编译使用的 Golang 版本
           binary_name: "image-api" # 可以指定二进制文件的名称
-          extra_files: README.md ./config/config.yaml # 需要包含的额外文件
+          extra_files: README.md readme-zh.md config/config.yaml # 需要包含的额外文件
