@@ -1,3 +1,4 @@
+[中文文档](readme-zh.md)
 [English Document](README.md)
 
 # Obsidian Image Api Gateway

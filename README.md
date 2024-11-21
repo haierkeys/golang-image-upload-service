@@ -1,3 +1,6 @@
+[中文文档](readme-zh.md)
+[English Document](README.md)
+
 # Obsidian Image API Gateway
 
 ### A Gateway Service for Image Upload/Storage/Sync with Cloud Storage for the `obsidian-auto-image-remote-uploader` Plugin
