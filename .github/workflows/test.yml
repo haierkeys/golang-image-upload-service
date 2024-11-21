@@ -21,13 +21,11 @@ jobs:
         echo "TIME=$TIME" >> $GITHUB_ENV
 
     - name: Get Tag Version
-      run: echo "RELEASE_VERSION=${GITHUB_REF/refs/tags/*}" >> $GITHUB_ENV
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
-    - name: build-linux
-      run: |
-        echo ${{ env.RELEASE_VERSION }}   ${{ env.TIME }}
+
     - name: Get version1
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
     - name: Echo Version
-      run: echo ${{ steps.get_version.outputs.VERSION }}
+      run: echo ${{ env.RELEASE_VERSION }}   ${{ env.TIME }} ${{ steps.get_version.outputs.VERSION }} ${{ github.ref_name }}
