@@ -26,13 +26,12 @@ jobs:
         TIME="$(TZ='Asia/Shanghai' date +'%FT%T%z')"
         echo "TIME=$TIME" >> $GITHUB_ENV
 
-    - name: Get version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Get Tag Version
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
     - name: build-linux
       run: |
-        GOOS=linux GOARCH=amd64 go build -X global.GitTag=${{ steps.get_version.outputs.VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/linux/image-api
+        GOOS=linux GOARCH=amd64 go build -X global.GitTag=${{ env.RELEASE_VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/linux/image-api
         mkdir -p ./build/linux/config
         mkdir -p ./build/linux/storage/logs
         mkdir -p ./build/linux/storage/uploads
@@ -40,7 +39,7 @@ jobs:
     - name: build-windows
       run: |
 
-        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -X global.GitTag=${{ steps.get_version.outputs.VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/windows/image-api.exe
+        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" go build -X global.GitTag=${{ env.RELEASE_VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/windows/image-api.exe
         mkdir -p ./build/windows/config
         mkdir -p ./build/windows/storage/logs
         mkdir -p ./build/windows/storage/uploads
@@ -50,7 +49,7 @@ jobs:
         GitTag	= $(shell git describe --tags)
         BuildTime=$(shell date +%FT%T%z)
         LDFLAGS=-ldflags "-X global.GitTag=$(GitTag) -X global.BuildTime=$(BuildTime)"
-        GOOS=darwin GOARCH=amd64 go build -X global.GitTag=${{ steps.get_version.outputs.VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/macos/image-api
+        GOOS=darwin GOARCH=amd64 go build -X global.GitTag=${{ env.RELEASE_VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/macos/image-api
         mkdir -p ./build/macos/config
         mkdir -p ./build/macos/storage/logs
         mkdir -p ./build/macos/storage/uploads
