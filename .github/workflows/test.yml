@@ -16,10 +16,14 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Set Time1
+      run: |
+        TIME="$(TZ='Asia/Shanghai' date +'%FT%T%z')"
+        echo "TIME=$TIME" >> $GITHUB_ENV
 
     - name: Set Time
-      run: echo "TIME=`$(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
+      run: echo "TIME2=`echo $(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
     - name: Get Tag Version
       run: echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
     - name: Echo Version
-      run: echo ${{ env.TAG_VERSION }} ${{ env.TIME }}
+      run: echo ${{ env.TAG_VERSION }} ${{ env.TIME }}${{ env.TIME2 }}
