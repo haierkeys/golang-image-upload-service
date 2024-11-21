@@ -75,6 +75,10 @@ https://github.com/haierkeys/obsidian-image-api-gateway/releases 下载最新版
 
 解压到相应的目录执行
 
+```bash
+./image-api run -c config/config.yaml
+```
+
 ## 配置
 
 配置文件默认文件名 _config.yaml_, 需要直到 _根目录_ 或者 _config_ 目录内

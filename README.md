@@ -71,6 +71,10 @@ Download the latest release from [GitHub Releases](https://github.com/haierkeys/
 
 Extract it to the desired directory and execute the binary.
 
+```bash
+./image-api run -c config/config.yaml
+```
+
 ## Configuration
 
 The default configuration file name is `_config.yaml_`, which should be located in the _root directory_ or the _config_ directory.

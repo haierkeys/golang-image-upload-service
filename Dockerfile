@@ -14,4 +14,4 @@ COPY ./build/linux/image-api /api/image-api
 CMD ["sh", "-c","cd /api/ \
   && touch storage/logs/c.log \
   && mv storage/logs/c.log storage/logs/c.log_$(date '+%Y%m%d%H%M%S%'| cut -b 1-17) \
-  && /api/image-api 2>&1 | tee storage/logs/c.log"]
+  && /api/image-api run 2>&1 | tee storage/logs/c.log"]
