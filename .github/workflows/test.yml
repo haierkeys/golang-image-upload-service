@@ -22,9 +22,9 @@ jobs:
 
     - name: Get Tag Version
       run: |
-        echo "RELEASE_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+        echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
         echo "RELEASE_VERSION2=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        echo "`echo $(git describe --tags)`"
+        echo "`git describe --tags`"
 
 
     - name: Echo Version
