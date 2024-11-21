@@ -5,9 +5,8 @@ name: Go
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "*"
+  release:
+    types: [created]
 env:
   PLUGIN_NAME: obsidian-image-api-gateway
 jobs:
