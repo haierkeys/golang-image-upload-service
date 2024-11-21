@@ -4,7 +4,7 @@ include .env
 #export $(shell sed 's/=.*//' .env)
 
 
-RemoteDockerHub = haierspi
+RemoteDockerHub = haierkeys
 
 ReleaseTagPre = release-v.
 DevelopTagPre = develop-v.
@@ -44,10 +44,10 @@ projectRootDir	=	$(shell pwd)
 
 sourceDir	=	$(projectRootDir)
 bin			=	$(projectRootDir)/image-api
-cfgDir		=	$(projectRootDir)/configs
+cfgDir		=	$(projectRootDir)/config
 cfgFile		=	$(cfgDir)/config.yaml
 buildDir	=	$(projectRootDir)/build
-buildCfgDir	=	$(buildDir)/configs
+buildCfgDir	=	$(buildDir)/config
 
 .PHONY: all build build-all zip-all run test clean build-linux build-windows build-macos push-online push-dev build-t
 all: test build
@@ -57,8 +57,8 @@ build:
 	$(goBuild) -o $(bin) -v $(sourceDir)
 	@echo "Build OK"
 	mv $(bin) $(buildDir)
-	mkdir -p $(buildDir)/configs
-	cp $(cfgDir)/config.yaml $(buildDir)/configs
+	mkdir -p $(buildDir)/config
+	cp $(cfgDir)/config.yaml $(buildDir)/config
 	mkdir -p $(buildDir)/storage/logs
 	mkdir -p $(buildDir)/storage/uploads
 	mkdir -p $(buildDir)/storage/temp
@@ -119,8 +119,8 @@ build-macos:
 	mkdir -p $(buildDir)/macos/
 	GOOS=darwin GOARCH=amd64 $(goBuild) -o $(bin) -v $(sourceDir)
 	mv $(bin) $(buildDir)/macos/
-	mkdir -p $(buildDir)/macos/configs
-	cp $(cfgDir)/config.yaml $(buildDir)/macos/configs
+	mkdir -p $(buildDir)/macos/config
+	cp $(cfgDir)/config.yaml $(buildDir)/macos/config
 	mkdir -p $(buildDir)/macos/storage/logs
 	mkdir -p $(buildDir)/macos/storage/uploads
 	mkdir -p $(buildDir)/linux/storage/temp
@@ -131,8 +131,8 @@ build-linux:
 	mkdir -p $(buildDir)/linux/
 	GOOS=linux GOARCH=amd64 $(goBuild) -o $(bin) -v $(sourceDir)
 	mv $(bin) $(buildDir)/linux/
-	mkdir -p $(buildDir)/linux/configs
-	cp $(cfgDir)/config.yaml $(buildDir)/linux/configs
+	mkdir -p $(buildDir)/linux/config
+	cp $(cfgDir)/config.yaml $(buildDir)/linux/config
 	mkdir -p $(buildDir)/linux/storage/logs
 	mkdir -p $(buildDir)/linux/storage/uploads
 	mkdir -p $(buildDir)/linux/storage/temp
@@ -144,8 +144,8 @@ build-windows:
 	mkdir -p $(buildDir)/windows/
 	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" $(goBuild) -o $(bin).exe -v $(sourceDir)
 	mv $(bin).exe $(buildDir)/windows/
-	mkdir -p $(buildDir)/windows/configs
-	cp $(cfgDir)/config.yaml $(buildDir)/windows/configs
+	mkdir -p $(buildDir)/windows/config
+	cp $(cfgDir)/config.yaml $(buildDir)/windows/config
 	mkdir -p $(buildDir)/windows/storage/logs
 	mkdir -p $(buildDir)/windows/storage/uploads
 	mkdir -p $(buildDir)/linux/storage/temp
