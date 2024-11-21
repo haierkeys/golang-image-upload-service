@@ -19,7 +19,8 @@ else
 endif
 
 # These are the values we want to pass for Version and BuildTime
-GitTag	= $(shell git describe --tags)
+# GitTag	= $(shell git describe --tags)
+GitTag	= $(shell git describe --abbrev=0)
 $(shell echo `git describe --abbrev=0`>VERSION)
 BuildTime=$(shell date +%FT%T%z)
 
