@@ -1,0 +1,89 @@
+server:
+  run-mode:
+  # Server port configuration:
+  # - Format: -ip:port (to specify a specific listening IP)
+  # - Format: :port (to listen on all available interfaces)
+  http-port: :8000
+  read-timeout: 60 # Maximum time (in seconds) to wait for the client to send data
+  write-timeout: 60 # Maximum time (in seconds) to wait for the server to send a response
+  # Interface for monitoring server performance (useful for internal debugging)
+  private-http-listen: :8001
+
+security:
+  # Authorization token for API requests (used to verify the client’s identity)
+  auth-token: 6666
+
+app:
+  default-page-size: 10 # Default number of items returned per page in paginated APIs
+  max-page-size: 100 # Maximum number of items allowed per page in paginated APIs
+  default-context-timeout: 60 # Default timeout (in seconds) for API requests
+  log-save-path: storage/logs # Directory to save application logs
+  log-file: app.log # Name of the log file
+
+  temp-path: storage/temp # Temporary directory for processing files
+  # Prefix for URLs returned by the API for uploaded files
+  upload-url-pre: https://image.diybeta.com
+  # Maximum allowed file size for uploads, in megabytes
+  upload-max-size: 5
+  # Allowed file types for uploads (based on extensions)
+  upload-allow-exts:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .gif
+    - .svg
+    - .tiff
+    - .heif
+    - .avif
+    - .webp
+
+# Configuration for local file storage
+local-fs:
+  enable: true # Whether to enable local file storage
+  # Enable an internal HTTP file access service for locally stored files
+  httpfs-enable: true
+  # Directory for saving uploaded files
+  save-path: storage/uploads
+
+# Configuration for Alibaba Cloud OSS (Object Storage Service)
+oss:
+  enable: false # Whether to enable OSS cloud storage
+  endpoint: # OSS endpoint URL (e.g., oss-cn-beijing.aliyuncs.com)
+  bucket-name: # Name of the OSS bucket
+  access-key-id: # Access key ID for OSS
+  access-key-secret: # Access key secret for OSS
+  # Prefix for directories where files are stored in OSS
+  custom-path: blog
+
+# Configuration for Cloudflare R2 storage
+cloudflu-r2:
+  enable: false # Whether to enable Cloudflare R2 storage
+  bucket-name: image # Name of the R2 bucket
+  account-id: # Cloudflare account ID
+  access-key-id: # R2 access key ID
+  access-key-secret: # R2 access key secret
+  # Prefix for directories where files are stored in R2
+  custom-path: blog
+
+# Configuration for Amazon S3 storage
+aws-s3:
+  enable: false # Whether to enable AWS S3 cloud storage
+  region: # AWS region (e.g., us-west-1)
+  bucket-name: # Name of the S3 bucket
+  access-key-id: # AWS access key ID
+  access-key-secret: # AWS access key secret
+  # Prefix for directories where files are stored in S3
+  custom-path: blog
+
+# Email configuration for sending error reports
+email:
+  error-report-enable: false # Whether to enable error reporting via email
+  host: smtp.gmail.com # SMTP server host
+  port: 465 # SMTP server port
+  user-name: xxx # Email account username
+  password: xxx # Email account password
+  is-ssl: true # Whether to use SSL for the connection
+  from: xxx # Sender's email address
+  to: # List of recipient email addresses
+    - xxx

@@ -1,67 +1,60 @@
-[中文文档](readme-zh.md)
-[English Document](README.md)
+[中文文档](readme-zh.md) / [English Document](README.md)
 
 # Obsidian Image API Gateway
+===
 
-### A Gateway Service for Image Upload/Storage/Sync with Cloud Storage for the `obsidian-auto-image-remote-uploader` Plugin
+Provides image upload/storage/sync services for the `obsidian-auto-image-remote-uploader` plugin.
 
----
+Feature List:
 
-### Features:
-
-- [x] **Image Upload Support**
-- [x] **Authorization Tokens** for enhanced API security
-- [x] **HTTP Access to Images** (basic feature; consider using Nginx as an alternative)
-- [x] **Storage Options:**
-  - [x] Save images locally and/or on cloud storage for easy migration
-  - [x] Local storage support (ideal for NAS setups)
-  - [x] Aliyun OSS Cloud Storage (functional, untested)
-  - [x] Cloudflare R2 Cloud Storage (functional, tested)
-  - [ ] Amazon S3 Support (under development)
-  - [ ] Google ECS Support (under development)
-- [x] **Docker Installation** for convenient deployment on home NAS or remote servers
-- [ ] **Public API** for users unable to host their own API service
-
----
+- [x] Support for image uploads
+- [x] Authorization token support for enhanced API security
+- [x] HTTP access to images (basic functionality; using Nginx is recommended)
+- [x] Storage-related features:
+  - [x] Support for simultaneous storage on both local and cloud storage for easy migration
+  - [x] Local storage support (prepared for NAS use,functionality supported and tested successfully)
+  - [x] Support for Alibaba Cloud OSS (functionality supported but not yet tested)
+  - [x] Support for Cloudflare R2 (functionality supported and tested successfully)
+  - [x] Support for Amazon S3 (functionality supported and tested successfully)
+  - [ ] Support for Google ECS (under development)
+- [x] Docker installation for easy deployment on home NAS or remote servers
+- [ ] Public API for users who are unable to set up their own API services
 
 ## Changelog
 
-### v0.5
-
-- Added support for AWS S3 and Cloudflare R2 storage.
-- Introduced simultaneous execution of multiple storage methods.
-- Renamed the project to **Obsidian Image API Gateway** for better recognition.
-
----
+[Changelog](https://github.com/haierkeys/obsidian-image-api-gateway/releases)
 
 ## Pricing
 
-This software is open-source and free to use. If you’d like to express your gratitude or support continued development, feel free to contribute using one of the options below:
+This software is open source and free to use. However, if you'd like to show your support or help with continued development, feel free to contribute in any of the following ways:
 
 - [![Paypal](https://img.shields.io/badge/paypal-haierkeys-yellow?style=social&logo=paypal)](https://paypal.me/haierkeys)
-- [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" width="100">](https://www.buymeacoffee.com/haierkeys)
-- <img src="https://raw.githubusercontent.com/haierkeys/obsidian-auto-image-remote-uploader/main/bmc_qr.png" style="width:120px;height:auto;">
-- **Afdian:** [https://afdian.net/a/haierkeys](https://afdian.net/a/haierkeys)
 
----
+- [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" width="100">](https://www.buymeacoffee.com/haierkeys)
+
+- <img src="https://raw.githubusercontent.com/haierkeys/obsidian-auto-image-remote-uploader/main/bmc_qr.png" style="width:120px;height:auto;">
+
+- Afdian: https://afdian.net/a/haierkeys
 
 # Getting Started
 
-### Dockerized Installation
+## Containerized Installation (Docker)
 
-Suppose your server’s image storage path is set to `/data/storage/uploads`. Run the following commands sequentially:
+Assume your server’s image storage path is _/data/storage/uploads_.
+
+Run the following commands:
 
 ```bash
-# Pull the Docker image
+# Pull the container image
 docker pull haierkeys/obsidian-image-api-gateway:latest
 
-# Create necessary directories
+# Create necessary directories for the project
 mkdir -p /data/image-api/config
 mkdir -p /data/image-api/storage/logs
 mkdir -p /data/image-api/storage/uploads
 
-# Download the default configuration to the config directory
-wget https://raw.githubusercontent.com/haierkeys/obsidian-image-api-gateway/main/configs/config.yaml -O /data/config/config.yaml
+# Download the default configuration file into the configuration directory
+wget https://raw.githubusercontent.com/haierkeys/obsidian-image-api-gateway/main/configs/config.yaml  -O /data/config/config.yaml
 
 # Create and start the container
 docker run -tid --name image-api \
@@ -72,105 +65,24 @@ docker run -tid --name image-api \
         haierkeys/obsidian-image-api-gateway:latest
 ```
 
----
+## Binary Installation
 
-### Binary Installation
+Download the latest release from [GitHub Releases](https://github.com/haierkeys/obsidian-image-api-gateway/releases).
 
-Download the latest release from [https://github.com/haierkeys/obsidian-image-api-gateway/releases](https://github.com/haierkeys/obsidian-image-api-gateway/releases).
+Extract it to the desired directory and execute the binary.
 
-Extract the files to a desired directory and execute the program.
+## Configuration
 
----
+The default configuration file name is `_config.yaml_`, which should be located in the _root directory_ or the _config_ directory.
 
-### Configuration
+For detailed configuration instructions, refer to:
 
-The configuration file is located at `./configs/config.yaml`. Below is the default content:
+- [Configuration File with English Comments](config\config-en.yaml)
 
-```yaml
-server:
-  run-mode:
-  # Server ports - Use `ip:port` (specific IP) or `:port` (listen on all IPs)
-  http-port: :8000
-  read-timeout: 60
-  write-timeout: 60
-  # Performance monitoring endpoint
-  private-http-listen: :8001
-
-security:
-  # API authorization token for image uploads
-  auth-token: 6666
-
-app:
-  default-page-size: 10
-  max-page-size: 100
-  default-context-timeout: 60
-  log-save-path: storage/logs
-  log-file: app.log
-
-  temp-path: storage/temp
-  # Prefix for API responses with uploaded image URLs
-  upload-url-pre: https://image.diybeta.com
-  # Upload size limit in MB
-  upload-max-size: 5
-  # Allowed image file types
-  upload-allow-exts:
-    - .jpg
-    - .jpeg
-    - .png
-    - .bmp
-    - .gif
-    - .svg
-    - .tiff
-    - .heif
-    - .avif
-    - .webp
-
-# Local storage configuration
-local-fs:
-  enable: true
-  # Enable built-in file URL access service
-  httpfs-enable: true
-  save-path: storage/uploads
-
-# Aliyun OSS configuration
-oss:
-  enable: false
-  custom-path: blog
-  bucket-name:
-  endpoint:
-  access-key-id:
-  access-key-secret:
-
-# Cloudflare R2 configuration
-cloudflu-r2:
-  enable: true
-  custom-path: blog
-  bucket-name: image
-  account-id:
-  access-key-id:
-  access-key-secret:
-
-# Email error reporting
-email:
-  error-report-enable: false
-  host: smtp.gmail.com
-  port: 465
-  user-name: xxx
-  password: xxx
-  is-ssl: true
-  from: xxx
-  to:
-    - xxx
-```
-
----
 
 ## TODO
 
----
-
-## Other
+## Others
 
 **Obsidian Auto Image Remote Uploader**
-
 [https://github.com/haierkeys/obsidian-auto-image-remote-uploader](https://github.com/haierkeys/obsidian-auto-image-remote-uploader)

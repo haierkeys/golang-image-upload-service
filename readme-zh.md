@@ -1,5 +1,4 @@
-[中文文档](readme-zh.md)
-[English Document](README.md)
+[中文文档](readme-zh.md) / [English Document](README.md)
 
 # Obsidian Image Api Gateway
 ===
@@ -13,19 +12,18 @@
 - [x] 图片http访问 (基础功能,建议使用 nginx 替代)
 - [x] 存储相关:
   - [x] 支持同时保存到本地或云存储,方便后续迁移
-  - [x] 支持本地保存 ( 为 NAS 准备 )
-  - [x] 支持 阿里云 OSS 云存储(功能支持,尚未测试)
-  - [x] 支持 Cloudflare R2 云存储(功能支持,测试OK)
-  - [ ] 支持 Amazon S3 (待开发)
-  - [ ] 支持 Google ECS (待开发)
+  - [x] 支持本地保存 ( 为 NAS 准备,功能支持,测试 OK )
+  - [x] 支持 阿里云 OSS 云存储( 功能支持,尚未测试 )
+  - [x] 支持 Cloudflare R2 云存储( 功能支持,测试 OK )
+  - [x] 支持 Amazon S3 ( 功能支持,测试OK )
+  - [ ] 支持 Google ECS ( 待开发 )
 - [x] Docker命令安装,方便大家使用在家庭NAS和远端服务器中
 - [ ] 增加公共API,针对不方便架设 API 服务的用户
 
 ## 变更日志
-- v0.5
-  增加对 AWS S3, Cloudflare R2 云存储的支持,
-  增加 存储方式同时执行
-  为了方便识别,将项目名改为 obsidian-image-api-gateway
+
+[Changelog](https://github.com/haierkeys/obsidian-image-api-gateway/releases)
+
 
 
 ## 价格
@@ -79,86 +77,12 @@ https://github.com/haierkeys/obsidian-image-api-gateway/releases 下载最新版
 
 ## 配置
 
-配置文件路径 _./configs/config.yaml_
+配置文件默认文件名 _config.yaml_, 需要直到 _根目录_ 或者 _config_ 目录内
 
-默认内容如下
+配置详情参阅:
 
-```yaml
-server:
-  run-mode:
-  # 服务端口-格式为-ip:port (注定监听ip) 或者 :port (监听所有)
-  http-port:  :8000
-  read-timeout: 60
-  write-timeout: 60
-  # 性能监听接口
-  private-http-listen:  :8001
-security:
-  # 图片上传api授权token
-  auth-token: 6666
-
-app:
-  default-page-size: 10
-  max-page-size: 100
-  default-context-timeout: 60
-  log-save-path: storage/logs
-  log-file: app.log
-
-  temp-path: storage/temp
-  # 接口返回上传前缀地址
-  upload-url-pre: https://image.diybeta.com
-  # 上传大小限制-单位mb
-  upload-max-size: 5
-  # 上传图片类型限制
-  upload-allow-exts:
-    - .jpg
-    - .jpeg
-    - .png
-    - .bmp
-    - .gif
-    - .svg
-    - .tiff
-    - .heif
-    - .avif
-    - .webp
-
-# 本地存储
-local-fs:
-  enable: true
-  # 是否启用内置的文件URL访问服务
-  httpfs-enable: true
-  save-path: storage/uploads
-
-
-# 阿里云oss
-oss:
-  # 是否开启oss云存储
-  enable: false
-  custom-path: blog
-  bucket-name:
-  endpoint:
-  access-key-id:
-  access-key-secret:
-
-cloudflu-r2:
-  # 是否开启R2云存储
-  enable: true
-  custom-path: blog
-  bucket-name: image
-  account-id:
-  access-key-id:
-  access-key-secret:
-
-email:
-  error-report-enable: false
-  host: smtp.gmail.com
-  port: 465
-  user-name: xxx
-  password: xxx
-  is-ssl: true
-  from: xxx
-  to:
-    - xxx
-```
+[配置文件-中文注释](config\config.yaml)
+[配置文件-英文注释](config\config-en.yaml)
 
 ## TODO
 
