@@ -1,94 +1,116 @@
-[中文文档](readme-zh.md)
-# Golang Image Upload Service
+# Obsidian Image API Gateway
 
-Image upload/storage/synchronization service for the obsidian-auto-image-remote-uploader plugin.
+### A Gateway Service for Image Upload/Storage/Sync with Cloud Storage for the `obsidian-auto-image-remote-uploader` Plugin
 
-- Support image upload
-- support authorization tokens, increase API security
-- image http access (basic function, suggest to use nginx instead)
-- Synchronization cloud storage (AliCloud OSS, Amazon S3, Google ECS).
-- Docker command installation, easy to use in the home NAS and websites
-- No need to build an environment to download and run directly
+---
 
-## Price
+### Features:
 
-This plugin is provided free of charge to everyone, but if you would like to show your appreciation or help support the continued development, please feel free to provide me with a little help in any of the following ways:
+- [x] **Image Upload Support**
+- [x] **Authorization Tokens** for enhanced API security
+- [x] **HTTP Access to Images** (basic feature; consider using Nginx as an alternative)
+- [x] **Storage Options:**
+  - [x] Save images locally and/or on cloud storage for easy migration
+  - [x] Local storage support (ideal for NAS setups)
+  - [x] Aliyun OSS Cloud Storage (functional, untested)
+  - [x] Cloudflare R2 Cloud Storage (functional, tested)
+  - [ ] Amazon S3 Support (under development)
+  - [ ] Google ECS Support (under development)
+- [x] **Docker Installation** for convenient deployment on home NAS or remote servers
+- [ ] **Public API** for users unable to host their own API service
 
-- [![Paypal](https://img.shields.io/badge/paypal-HaierSpi-yellow?style=social&logo=paypal)](https://paypal.me/haierspi)
+---
 
-- [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" width="100">](https://www.buymeacoffee.com/haierspi)
-<img src="https://raw.githubusercontent.com/haierspi/obsidian-auto-image-remote-uploader/main/bmc_qr.png" style="width:120px;height:auto;">
+## Changelog
 
-- afdian: https://afdian.net/a/haierspi
+### v0.5
+
+- Added support for AWS S3 and Cloudflare R2 storage.
+- Introduced simultaneous execution of multiple storage methods.
+- Renamed the project to **Obsidian Image API Gateway** for better recognition.
+
+---
+
+## Pricing
+
+This software is open-source and free to use. If you’d like to express your gratitude or support continued development, feel free to contribute using one of the options below:
+
+- [![Paypal](https://img.shields.io/badge/paypal-haierkeys-yellow?style=social&logo=paypal)](https://paypal.me/haierkeys)
+- [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="BuyMeACoffee" width="100">](https://www.buymeacoffee.com/haierkeys)
+- <img src="https://raw.githubusercontent.com/haierkeys/obsidian-auto-image-remote-uploader/main/bmc_qr.png" style="width:120px;height:auto;">
+- **Afdian:** [https://afdian.net/a/haierkeys](https://afdian.net/a/haierkeys)
+
+---
+
 # Getting Started
 
-## Containerized installation (docker way)
+### Dockerized Installation
 
-Assuming your server image storage path is */data/storage/uploads*, run the following commands in order to install your server.
-
-Execute the following commands in order
+Suppose your server’s image storage path is set to `/data/storage/uploads`. Run the following commands sequentially:
 
 ```bash
-# Download the container image
-docker pull haierspi/golang-image-upload-service:latest
+# Pull the Docker image
+docker pull haierkeys/obsidian-image-api-gateway:latest
 
-# Create the necessary directories for the project to run
+# Create necessary directories
 mkdir -p /data/image-api/config
 mkdir -p /data/image-api/storage/logs
 mkdir -p /data/image-api/storage/uploads
 
-# Download the default configuration to the config file directory
-wget https://raw.githubusercontent.com/haierspi/golang-image-upload-service/main/configs/config.yaml -O /data/config/config.yaml
+# Download the default configuration to the config directory
+wget https://raw.githubusercontent.com/haierkeys/obsidian-image-api-gateway/main/configs/config.yaml -O /data/config/config.yaml
 
-# Create & start the container
+# Create and start the container
 docker run -tid --name image-api \
         -p 8000:8000 -p 8001:8001 \
         -v /data/image-api/storage/logs/:/api/storage/logs/ \
         -v /data/image-api/storage/uploads/:/api/storage/uploads/ \
         -v /data/image-api/config/:/api/config/ \
-        haierspi/golang-image-upload-service:latest
-
+        haierkeys/obsidian-image-api-gateway:latest
 ```
 
-## Binary download and installation
+---
 
-https://github.com/haierspi/golang-image-upload-service/releases Download the latest version
+### Binary Installation
 
-Unzip it to the appropriate directory and run
-## Configuration
+Download the latest release from [https://github.com/haierkeys/obsidian-image-api-gateway/releases](https://github.com/haierkeys/obsidian-image-api-gateway/releases).
 
-Configuration file path *. /configs/config.yaml*
+Extract the files to a desired directory and execute the program.
 
-The default content is as follows
+---
+
+### Configuration
+
+The configuration file is located at `./configs/config.yaml`. Below is the default content:
 
 ```yaml
-Server:
-  RunMode: debug
-  # Service ports in the form IP:PORT (destined to listen on IP) or :PORT (listen on all)
-  HttpPort:  :8000
-  ReadTimeout: 60
-  WriteTimeout: 60
-  # Performance Listening Interface
-  PrivateHttpListen:  :8001
-Security:
-  # Image Upload API Authorization TOKEN
-  AuthToken: 6666
-App:
-  DefaultPageSize: 10
-  MaxPageSize: 100
-  DefaultContextTimeout: 60
-  LogSavePath: storage/logs
-  LogFileName: app
-  LogFileExt: .log
-  # Image file storage path
-  UploadSavePath: storage/uploads
-  TempPath: storage/temp
-  # Access address for uploading attachments, including UploadSavePath, which describes the URL prefix that the interface returns to the uploader.
-  UploadServerUrl: http://127.0.0.1:8000/storage/uploads
-  # Upload size limit; unit: MB
-  UploadImageMaxSize: 5
-  # Upload Image File types limit
-  UploadImageAllowExts:
+server:
+  run-mode:
+  # Server ports - Use `ip:port` (specific IP) or `:port` (listen on all IPs)
+  http-port: :8000
+  read-timeout: 60
+  write-timeout: 60
+  # Performance monitoring endpoint
+  private-http-listen: :8001
+
+security:
+  # API authorization token for image uploads
+  auth-token: 6666
+
+app:
+  default-page-size: 10
+  max-page-size: 100
+  default-context-timeout: 60
+  log-save-path: storage/logs
+  log-file: app.log
+
+  temp-path: storage/temp
+  # Prefix for API responses with uploaded image URLs
+  upload-url-pre: https://image.diybeta.com
+  # Upload size limit in MB
+  upload-max-size: 5
+  # Allowed image file types
+  upload-allow-exts:
     - .jpg
     - .jpeg
     - .png
@@ -96,29 +118,56 @@ App:
     - .gif
     - .svg
     - .tiff
-# AliCloud OSS
-OSS:
-  # Whether to enable OSS cloud storage
-  Enable: false
-  BucketName:
-  Endpoint:
-  AccessKeyID:
-  AccessKeySecret:
+    - .heif
+    - .avif
+    - .webp
 
-Email:
-  Host: smtp.gmail.com
-  Port: 465
-  UserName: xxx
-  Password: xxx
-  IsSSL: true
-  From: xxx
-  To:
+# Local storage configuration
+local-fs:
+  enable: true
+  # Enable built-in file URL access service
+  httpfs-enable: true
+  save-path: storage/uploads
+
+# Aliyun OSS configuration
+oss:
+  enable: false
+  custom-path: blog
+  bucket-name:
+  endpoint:
+  access-key-id:
+  access-key-secret:
+
+# Cloudflare R2 configuration
+cloudflu-r2:
+  enable: true
+  custom-path: blog
+  bucket-name: image
+  account-id:
+  access-key-id:
+  access-key-secret:
+
+# Email error reporting
+email:
+  error-report-enable: false
+  host: smtp.gmail.com
+  port: 465
+  user-name: xxx
+  password: xxx
+  is-ssl: true
+  from: xxx
+  to:
     - xxx
 ```
+
+---
+
 ## TODO
+
+---
 
 ## Other
 
-Obsidian Auto Image Remote Uploader
+**Obsidian Auto Image Remote Uploader**
 
-https://github.com/haierspi/obsidian-auto-image-remote-uploader
+[https://github.com/haierkeys/obsidian-auto-image-remote-uploader](https://github.com/haierkeys/obsidian-auto-image-remote-uploader)
