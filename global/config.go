@@ -1,10 +1,13 @@
 package global
 
 import (
+    "fmt"
     "os"
 
     "github.com/pkg/errors"
     "gopkg.in/yaml.v3"
+
+    "github.com/haierspi/golang-image-upload-service/pkg/path"
 )
 
 var (
@@ -112,6 +115,13 @@ type email struct {
 
 // ConfigLoad 初始化
 func ConfigLoad(f string) error {
+
+    realpath, err := path.GetAbsPath(f, "")
+    if err != nil {
+        return err
+    }
+
+    fmt.Println("Config Absolute Path: " + realpath)
 
     Config.File = f
     file, err := os.ReadFile(f)

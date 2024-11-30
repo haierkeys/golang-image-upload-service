@@ -66,15 +66,16 @@ func init() {
                 }
             }
 
+            log.Println("Load Config File: ", runEnv.config, "\n")
+
             if err := global.ConfigLoad(runEnv.config); err != nil {
                 fmt.Println(err)
+                os.Exit(1)
             }
 
             if len(runEnv.runMode) > 0 {
                 global.Config.Server.RunMode = runEnv.runMode
             }
-
-            fmt.Println("Config Path : " + runEnv.config)
 
             gin.SetMode(global.Config.Server.RunMode)
 

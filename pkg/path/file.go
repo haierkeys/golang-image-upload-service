@@ -1,9 +1,11 @@
 package path
 
 import (
+    "errors"
     "os"
     "os/exec"
     "path/filepath"
+    "runtime"
     "strings"
 )
 
@@ -24,6 +26,7 @@ func Exists(path string) bool {
     return true
 }
 
+// PathSuffixCheckAdd 检查路径后缀，如果没有则添加
 func PathSuffixCheckAdd(path string, suffix string) string {
     if !strings.HasSuffix(path, suffix) {
 
@@ -32,16 +35,40 @@ func PathSuffixCheckAdd(path string, suffix string) string {
     return path
 }
 
-func GetPath(path string, root string) string {
-    path = strings.TrimPrefix(path, "/")
-    realPath := ""
-    if !Exists(root + path) {
-        pwdDir, _ := os.Getwd()
-        realPath = pwdDir + "/" + path
-    } else {
-        realPath = root + path
+func IsAbsPath(path string) bool {
+    if runtime.GOOS == "windows" {
+        // Windows系统
+        if filepath.VolumeName(path) != "" {
+            return true // 如果有盘符，则为绝对路径
+        }
+        return filepath.IsAbs(path) // 检查是否是绝对路径
     }
-    return realPath
+    // UNIX/Linux系统
+    return filepath.IsAbs(path)
+}
+
+func GetAbsPath(path string, root string) (string, error) {
+
+    // path = strings.TrimPrefix(path, "/")
+
+    if root != "" {
+        root = PathSuffixCheckAdd(root, "/")
+    }
+
+    realPath := root + path
+
+    // 如果本身就是绝对路径 就直接返回
+    if IsAbsPath(realPath) {
+
+    } else {
+        pwdDir, _ := os.Getwd()
+        realPath = PathSuffixCheckAdd(pwdDir, "/") + path
+    }
+    if Exists(realPath) {
+        return realPath, nil
+    } else {
+        return "", errors.New("path not exists")
+    }
 }
 
 // 判断所给路径是否为文件夹
