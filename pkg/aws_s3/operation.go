@@ -4,6 +4,7 @@ import (
     "bytes"
     "context"
     "fmt"
+    "io"
     "mime/multipart"
     "time"
 
@@ -33,19 +34,19 @@ func (p *S3) GetBucket(bucketName string) string {
 }
 
 // UploadByFile 上传文件
-func (p *S3) SendFile(fileKey string, file multipart.File, h *multipart.FileHeader) (string, error) {
+func (p *S3) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (string, error) {
 
     ctx := context.Background()
     bucket := p.GetBucket("")
 
     fileKey = pkg_path.PathSuffixCheckAdd(global.Config.AWSS3.CustomPath, "/") + fileKey
 
-    k, _ := h.Open()
+    //  k, _ := h.Open()
 
     _, err := p.S3Client.PutObject(ctx, &s3.PutObjectInput{
         Bucket:      aws.String(bucket),
         Key:         aws.String(fileKey),
-        Body:        k,
+        Body:        file,
         ContentType: aws.String(h.Header.Get("Content-Type")),
     })
 

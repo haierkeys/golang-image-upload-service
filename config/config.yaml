@@ -32,11 +32,15 @@ app:
     - .png
     - .bmp
     - .gif
-    - .svg
     - .tiff
-    - .heif
     - .avif
     - .webp
+  # 上传图片尺寸限制-宽度
+  image-max-size-width: 500
+  # 上传图片尺寸限制-高度
+  image-max-size-height: 500
+  # 上传图片质量 0-100 区间
+  image-quality: 500
 
 # 本地文件存储配置
 local-fs:

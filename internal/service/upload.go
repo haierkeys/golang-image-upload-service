@@ -1,13 +1,25 @@
 package service
 
 import (
+    "bytes"
+    "image"
+    "image/gif"
+    "image/jpeg"
+    "image/png"
     "io"
     "mime/multipart"
     "net/http"
     "os"
 
+    "golang.org/x/image/tiff"
+    _ "golang.org/x/image/webp"
+    "github.com/gen2brain/avif"
     "github.com/google/uuid"
+    "github.com/nfnt/resize"
     "github.com/pkg/errors"
+    "golang.org/x/image/bmp"
+
+    "github.com/chai2010/webp"
 
     "github.com/haierspi/golang-image-upload-service/global"
     "github.com/haierspi/golang-image-upload-service/pkg/aws_s3"
@@ -24,7 +36,7 @@ type FileInfo struct {
 }
 
 type Uploader interface {
-    SendFile(pathKey string, f multipart.File, h *multipart.FileHeader) (string, error)
+    SendFile(pathKey string, file io.Reader, h *multipart.FileHeader) (string, error)
     SendContent(pathKey string, content []byte) (string, error)
 }
 
@@ -97,6 +109,57 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
     var dstFileKey string
 
+    // 压缩
+
+    _, err := file.Seek(0, 0)
+
+    img, filetype, err := image.Decode(file)
+
+    if err != nil {
+        return nil, err
+    }
+
+    size := img.Bounds().Size()
+
+    wRatio := float64(size.X) / float64(global.Config.App.ImageMaxSizeWidth)
+    hRatio := float64(size.Y) / float64(global.Config.App.ImageMaxSizeHeight)
+    ratio := wRatio
+    if hRatio > wRatio {
+        ratio = hRatio
+    }
+    // 创建新的图像对象
+    newWidth := uint(float64(size.X) / ratio)
+    newHeight := uint(float64(size.Y) / ratio)
+
+    writer := &bytes.Buffer{}
+
+    // 调整图片大小
+    newImage := resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
+
+    switch filetype {
+    case "png":
+        err = png.Encode(writer, newImage)
+    case "gif":
+        err = gif.Encode(writer, newImage, &gif.Options{NumColors: 256})
+    case "jpeg", "jpg":
+        err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
+    case "bmp":
+        err = bmp.Encode(writer, newImage)
+    case "tif", "tiff":
+        err = tiff.Encode(writer, newImage, nil)
+    case "webp":
+        err = webp.Encode(writer, newImage, &webp.Options{Quality: float32(global.Config.App.ImageQuality)})
+    case "avif":
+        err = avif.Encode(writer, newImage, avif.Options{Quality: global.Config.App.ImageQuality})
+
+    default:
+        return nil, errors.New("Unknown image type:" + filetype)
+    }
+
+    if err != nil {
+        return nil, err
+    }
+
     for _, v := range []string{"local_fs", "oss", "cloudflare_r2", "aws_s3"} {
 
         if v == "local_fs" && global.Config.LocalFS.Enable {
@@ -128,7 +191,7 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
             continue
         }
         var err error
-        dstFileKey, err = up[v].SendFile(fileKey, file, fileHeader)
+        dstFileKey, err = up[v].SendFile(fileKey, writer, fileHeader)
         if err != nil {
             return nil, err
         }

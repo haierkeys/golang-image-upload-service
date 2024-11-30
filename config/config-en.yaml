@@ -32,11 +32,15 @@ app:
     - .png
     - .bmp
     - .gif
-    - .svg
     - .tiff
-    - .heif
     - .avif
     - .webp
+  # Image Upload Size Limit - Width
+  image-max-size-width: 500
+  # Image Upload Size Limit - Height
+  image-max-size-height: 500
+  # Image Quality Range 0-100
+  image-quality: 75
 
 # Configuration for local file storage
 local-fs:

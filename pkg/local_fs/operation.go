@@ -17,7 +17,7 @@ type LocalFS struct {
     IsCheckSave bool
 }
 
-func (p LocalFS) CheckSave() error {
+func (p *LocalFS) CheckSave() error {
 
     savePath := p.getSavePath()
 
@@ -33,12 +33,12 @@ func (p LocalFS) CheckSave() error {
     return nil
 }
 
-func (p LocalFS) getSavePath() string {
+func (p *LocalFS) getSavePath() string {
     return pkg_path.PathSuffixCheckAdd(global.Config.LocalFS.SavePath, "/")
 }
 
-// SendByFile 上传文件
-func (p *LocalFS) SendFile(fileKey string, file multipart.File, h *multipart.FileHeader) (string, error) {
+// SendFile  上传文件
+func (p *LocalFS) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (string, error) {
     if !p.IsCheckSave {
         if err := p.CheckSave(); err != nil {
             return "", err
@@ -58,7 +58,7 @@ func (p *LocalFS) SendFile(fileKey string, file multipart.File, h *multipart.Fil
     }
     defer out.Close()
 
-    file.Seek(0, 0)
+    // file.Seek(0, 0)
     _, err = io.Copy(out, file)
     if err != nil {
         return "", err

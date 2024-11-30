@@ -64,6 +64,10 @@ type app struct {
     UploadMaxSize int `yaml:"upload-max-size"`
     // 上传图片允许的扩展名
     UploadAllowExts []string `yaml:"upload-allow-exts"`
+
+    ImageMaxSizeWidth  int `yaml:"image-max-size-width"`
+    ImageMaxSizeHeight int `yaml:"image-max-size-height"`
+    ImageQuality       int `yaml:"image-quality"`
 }
 
 // StorageLocal struct
