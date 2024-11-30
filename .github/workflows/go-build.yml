@@ -27,7 +27,7 @@ jobs:
         run: echo "TIME=`echo $(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
       - name: Get Tag Version
         run: echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
-      - uses: wangyoucao577/go-release-action@v1.52
+      - uses: haierkeys/go-release-action@latest
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # 一个默认的变量，用来实现往 Release 中添加文件
           goos: ${{ matrix.goos }}

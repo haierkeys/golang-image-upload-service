@@ -12,7 +12,6 @@ import (
     "os"
 
     "golang.org/x/image/tiff"
-    _ "golang.org/x/image/webp"
     "github.com/gen2brain/avif"
     "github.com/google/uuid"
     "github.com/nfnt/resize"
