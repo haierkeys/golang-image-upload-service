@@ -27,10 +27,12 @@ jobs:
         run: echo "TIME=`echo $(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
       - name: Get Tag Version
         run: echo "TAG_VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+      - name: Get Tag Version
+        run: echo "LDFLAGS=-ldflags \"-X global.GitTag=${{ env.TAG_VERSION }} -X global.BuildTime=${{ env.TIME }}\"" >> $GITHUB_ENV
 
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -X global.GitTag=${{ env.TAG_VERSION }}  -X global.BuildTime=${{ env.TIME }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
+          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
           cp ./config/config.yaml ./build/${{ matrix.goos }}-${{ matrix.goarch }}/config
 
       - name: GZip file
