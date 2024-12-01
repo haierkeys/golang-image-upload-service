@@ -5,7 +5,6 @@ import (
     "context"
     "fmt"
     "io"
-    "mime/multipart"
     "time"
 
     "github.com/aws/aws-sdk-go-v2/aws"
@@ -34,7 +33,7 @@ func (p *S3) GetBucket(bucketName string) string {
 }
 
 // UploadByFile 上传文件
-func (p *S3) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (string, error) {
+func (p *S3) SendFile(fileKey string, file io.Reader, itype string) (string, error) {
 
     ctx := context.Background()
     bucket := p.GetBucket("")
@@ -47,7 +46,7 @@ func (p *S3) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (
         Bucket:      aws.String(bucket),
         Key:         aws.String(fileKey),
         Body:        file,
-        ContentType: aws.String(h.Header.Get("Content-Type")),
+        ContentType: aws.String(itype),
     })
 
     if err != nil {

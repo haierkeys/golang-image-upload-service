@@ -3,7 +3,6 @@ package oss
 import (
     "bytes"
     "io"
-    "mime/multipart"
 
     oss_sdk "github.com/aliyun/aliyun-oss-go-sdk/oss"
 
@@ -27,7 +26,7 @@ func (p *OSS) GetBucket(bucketName string) error {
     return err
 }
 
-func (p *OSS) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (string, error) {
+func (p *OSS) SendFile(fileKey string, file io.Reader, itype string) (string, error) {
 
     if p.Bucket == nil {
         err := p.GetBucket("")

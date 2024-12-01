@@ -8,17 +8,14 @@ import (
     "image/png"
     "io"
     "mime/multipart"
-    "net/http"
-    "os"
 
-    "golang.org/x/image/tiff"
     "github.com/gen2brain/avif"
     "github.com/google/uuid"
     "github.com/nfnt/resize"
     "github.com/pkg/errors"
     "golang.org/x/image/bmp"
-
-    "github.com/chai2010/webp"
+    "golang.org/x/image/tiff"
+    _ "golang.org/x/image/webp"
 
     "github.com/haierspi/golang-image-upload-service/global"
     "github.com/haierspi/golang-image-upload-service/pkg/aws_s3"
@@ -35,51 +32,12 @@ type FileInfo struct {
 }
 
 type Uploader interface {
-    SendFile(pathKey string, file io.Reader, h *multipart.FileHeader) (string, error)
+    SendFile(pathKey string, file io.Reader, cType string) (string, error)
     SendContent(pathKey string, content []byte) (string, error)
 }
 
 func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
     return svc.fileSyncHandle(fileType, file, fileHeader)
-}
-
-func (svc *Service) UploadFileByURL(fileType upload.FileType, url string) (*FileInfo, error) {
-
-    resp, err := http.Get(url)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
-
-    uploadTempPath := upload.GetTempPath() + "/uploads"
-
-    uploadTempFile := uploadTempPath + "/" + uuid.New().String() + upload.GetFileExt(url)
-
-    if upload.CheckPath(uploadTempPath) {
-        if err := upload.CreatePath(uploadTempPath, os.ModePerm); err != nil {
-            return nil, errors.New("failed to create save directory.")
-        }
-    }
-    if upload.CheckPermission(uploadTempPath) {
-        return nil, errors.New("insufficient file permissions.")
-    }
-
-    file, err := os.Create(uploadTempFile)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
-    defer os.Remove(uploadTempFile)
-
-    _, err = io.Copy(file, resp.Body)
-    if err != nil {
-        return nil, err
-    }
-
-    muFile, fileHeader, err := upload.FileToMultipart(file)
-
-    return svc.fileSyncHandle(fileType, muFile, fileHeader)
-
 }
 
 func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
@@ -95,6 +53,8 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
         fileName = upload.GetFileName(fileHeader.Filename)
     }
 
+    cType := fileHeader.Header.Get("Content-Type")
+
     if !upload.CheckContainExt(fileType, fileName) {
         return nil, errors.New("file suffix is not supported.")
     }
@@ -109,7 +69,6 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
     var dstFileKey string
 
     // 压缩
-
     _, err := file.Seek(0, 0)
 
     img, filetype, err := image.Decode(file)
@@ -147,7 +106,11 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
     case "tif", "tiff":
         err = tiff.Encode(writer, newImage, nil)
     case "webp":
-        err = webp.Encode(writer, newImage, &webp.Options{Quality: float32(global.Config.App.ImageQuality)})
+        cType = "image/jpg"
+        ext := upload.GetFileExt(fileKey)
+        fileKey = fileKey[0:len(fileKey)-len(ext)] + ".jpg"
+
+        err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
     case "avif":
         err = avif.Encode(writer, newImage, avif.Options{Quality: global.Config.App.ImageQuality})
 
@@ -190,7 +153,7 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
             continue
         }
         var err error
-        dstFileKey, err = up[v].SendFile(fileKey, writer, fileHeader)
+        dstFileKey, err = up[v].SendFile(fileKey, writer, cType)
         if err != nil {
             return nil, err
         }

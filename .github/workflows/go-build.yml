@@ -30,17 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, windows] # 需要打包的系统
-        goarch: [amd64, arm64] # 需要打包的架构
-        include:
-        - goos: windows
-          goarch: amd64
-          cc: CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp"
-        exclude: # 排除某些平台和架构
-          - goos: windows
-            goarch: arm64
-          - goos: linux
-            goarch: arm64
+        jobs:
+          - { goos: darwin, goarch: arm64, cc: "" }
+          - { goos: windows, goarch: amd64, cc: "" }
+          - { goos: linux, goarch: amd64, cc: "" }
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -57,13 +50,13 @@ jobs:
 
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} ${{ matrix.cc }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
-          cp ./config/config.yaml ./build/${{ matrix.goos }}-${{ matrix.goarch }}/config.yaml
+          CGO_ENABLED=0 GOOS=${{ matrix.jobs.goos }} GOARCH=${{ matrix.jobs.goarch }} ${{ matrix.jobs.cc }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/image-api
+          cp ./config/config.yaml ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/config.yaml
 
       - name: GZip file
         id: gzip
         run: |
-          tar -czvf ./build/${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz -C ./build/${{ matrix.goos }}-${{ matrix.goarch }}/ .
+          tar -czvf ./build/${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}.tar.gz -C ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }} .
       - name: Upload GZip file
         id: upload-macos
         uses: actions/upload-release-asset@v1
@@ -71,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-realese.outputs.upload_url }}
-          asset_path: ./build/${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
-          asset_name: ${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          asset_path: ./build/${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}.tar.gz
+          asset_name: ${{ env.PLUGIN_NAME }}-${{ env.TAG_VERSION }}-${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}.tar.gz
           asset_content_type: application/gzip

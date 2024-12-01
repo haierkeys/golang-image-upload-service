@@ -4,7 +4,6 @@ import (
     "bytes"
     "errors"
     "io"
-    "mime/multipart"
     "os"
     "path"
 
@@ -38,7 +37,7 @@ func (p *LocalFS) getSavePath() string {
 }
 
 // SendFile  上传文件
-func (p *LocalFS) SendFile(fileKey string, file io.Reader, h *multipart.FileHeader) (string, error) {
+func (p *LocalFS) SendFile(fileKey string, file io.Reader, itype string) (string, error) {
     if !p.IsCheckSave {
         if err := p.CheckSave(); err != nil {
             return "", err
