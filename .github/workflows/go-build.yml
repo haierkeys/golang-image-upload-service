@@ -2,8 +2,9 @@ name: Go
 
 on:
   workflow_dispatch:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "*"
 env:
   PLUGIN_NAME: obsidian-image-api-gateway
 jobs:
@@ -32,7 +33,7 @@ jobs:
       matrix:
         jobs:
           - { goos: darwin, goarch: arm64, cc: "" }
-          - { goos: windows, goarch: amd64, cc: "" }
+          - { goos: windows, goarch: amd64, cc: "", ext: ".exe"  }
           - { goos: linux, goarch: amd64, cc: "" }
     steps:
       - uses: actions/checkout@v3
@@ -50,8 +51,8 @@ jobs:
 
       - name: build
         run: |
-          CGO_ENABLED=0 GOOS=${{ matrix.jobs.goos }} GOARCH=${{ matrix.jobs.goarch }} ${{ matrix.jobs.cc }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/image-api
-          cp ./config/config.yaml ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/config.yaml
+          CGO_ENABLED=0 GOOS=${{ matrix.jobs.goos }} GOARCH=${{ matrix.jobs.goarch }} ${{ matrix.jobs.cc }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/image-api${{ matrix.jobs.ext }}
+          cp ./config/config.yaml ./build/${{ matrix.jobs.goos }}-${{ matrix.jobs.goarch }}/
 
       - name: GZip file
         id: gzip
