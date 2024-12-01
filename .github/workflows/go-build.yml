@@ -35,6 +35,8 @@ jobs:
         exclude: # 排除某些平台和架构
           - goarch: arm64
             goos: windows
+          - goarch: arm64
+            goos: linux
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -52,7 +54,7 @@ jobs:
       - name: build
         run: |
           CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
-          cp ./config/config.yaml ./build/${{ matrix.goos }}-${{ matrix.goarch }}/config
+          cp ./config/config.yaml ./build/${{ matrix.goos }}-${{ matrix.goarch }}/config.yaml
 
       - name: GZip file
         id: gzip
