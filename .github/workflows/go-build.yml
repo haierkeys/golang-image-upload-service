@@ -32,11 +32,15 @@ jobs:
       matrix:
         goos: [linux, windows] # 需要打包的系统
         goarch: [amd64, arm64] # 需要打包的架构
+        include:
+        - goos: windows
+          goarch: amd64
+          cc: CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp"
         exclude: # 排除某些平台和架构
-          - goarch: arm64
-            goos: windows
-          - goarch: arm64
-            goos: linux
+          - goos: windows
+            goarch: arm64
+          - goos: linux
+            goarch: arm64
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -53,7 +57,7 @@ jobs:
 
       - name: build
         run: |
-          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
+          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} ${{ matrix.cc }} go build ${{ env.LDFLAGS }} -o ./build/${{ matrix.goos }}-${{ matrix.goarch }}/image-api
           cp ./config/config.yaml ./build/${{ matrix.goos }}-${{ matrix.goarch }}/config.yaml
 
       - name: GZip file
