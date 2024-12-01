@@ -26,7 +26,7 @@ jobs:
         release_name: ${{ github.ref }}
         draft: false
         prerelease: false
-    - name: Set Time
+    - name: echo create_release
       run: echo ${{ steps.create_release.outputs.upload_url }}
     - name: Set Time
       run: echo "TIME=`echo $(TZ='Asia/Shanghai' date +'%FT%T%z')`" >> $GITHUB_ENV
