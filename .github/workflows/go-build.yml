@@ -33,6 +33,7 @@ jobs:
       matrix:
         jobs:
           - { goos: darwin, goarch: arm64, cc: "" }
+          - { goos: darwin, goarch: amd64, cc: "" }
           - { goos: windows, goarch: amd64, cc: "", ext: ".exe"  }
           - { goos: linux, goarch: amd64, cc: "" }
     steps:
