@@ -20,8 +20,6 @@ jobs:
         env:
           token: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
           draft: false
           prerelease: false
   build-push-docker:
