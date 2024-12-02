@@ -65,8 +65,9 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
     fileKey := upload.GetSavePreDirPath() + fileName
 
     var up = make(map[string]Uploader)
-
     var dstFileKey string
+
+    writer := &bytes.Buffer{}
 
     // 压缩
     _, err := file.Seek(0, 0)
@@ -79,47 +80,51 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
     size := img.Bounds().Size()
 
-    wRatio := float64(size.X) / float64(global.Config.App.ImageMaxSizeWidth)
-    hRatio := float64(size.Y) / float64(global.Config.App.ImageMaxSizeHeight)
-    ratio := wRatio
-    if hRatio > wRatio {
-        ratio = hRatio
-    }
-    // 创建新的图像对象
-    newWidth := uint(float64(size.X) / ratio)
-    newHeight := uint(float64(size.Y) / ratio)
+    if size.X > global.Config.App.ImageMaxSizeWidth || size.Y > global.Config.App.ImageMaxSizeHeight {
 
-    writer := &bytes.Buffer{}
+        wRatio := float64(size.X) / float64(global.Config.App.ImageMaxSizeWidth)
+        hRatio := float64(size.Y) / float64(global.Config.App.ImageMaxSizeHeight)
+        ratio := wRatio
+        if hRatio > wRatio {
+            ratio = hRatio
+        }
+        // 创建新的图像对象
+        newWidth := uint(float64(size.X) / ratio)
+        newHeight := uint(float64(size.Y) / ratio)
 
-    // 调整图片大小
-    newImage := resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
+        // 调整图片大小
+        newImage := resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
 
-    switch filetype {
-    case "png":
-        err = png.Encode(writer, newImage)
-    case "gif":
-        err = gif.Encode(writer, newImage, &gif.Options{NumColors: 256})
-    case "jpeg", "jpg":
-        err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
-    case "bmp":
-        err = bmp.Encode(writer, newImage)
-    case "tif", "tiff":
-        err = tiff.Encode(writer, newImage, nil)
-    case "webp":
-        cType = "image/jpg"
-        ext := upload.GetFileExt(fileKey)
-        fileKey = fileKey[0:len(fileKey)-len(ext)] + ".jpg"
+        switch filetype {
+        case "png":
+            err = png.Encode(writer, newImage)
+        case "gif":
+            err = gif.Encode(writer, newImage, &gif.Options{NumColors: 256})
+        case "jpeg", "jpg":
+            err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
+        case "bmp":
+            err = bmp.Encode(writer, newImage)
+        case "tif", "tiff":
+            err = tiff.Encode(writer, newImage, nil)
+        case "webp":
+            cType = "image/jpg"
+            ext := upload.GetFileExt(fileKey)
+            fileKey = fileKey[0:len(fileKey)-len(ext)] + ".jpg"
 
-        err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
-    case "avif":
-        err = avif.Encode(writer, newImage, avif.Options{Quality: global.Config.App.ImageQuality})
+            err = jpeg.Encode(writer, newImage, &jpeg.Options{Quality: global.Config.App.ImageQuality})
+        case "avif":
+            err = avif.Encode(writer, newImage, avif.Options{Quality: global.Config.App.ImageQuality})
 
-    default:
-        return nil, errors.New("Unknown image type:" + filetype)
-    }
+        default:
+            return nil, errors.New("Unknown image type:" + filetype)
+        }
 
-    if err != nil {
-        return nil, err
+        if err != nil {
+            return nil, err
+        }
+
+    } else {
+        _, err = io.Copy(writer, file)
     }
 
     for _, v := range []string{"local_fs", "oss", "cloudflare_r2", "aws_s3"} {

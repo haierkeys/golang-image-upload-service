@@ -41,8 +41,6 @@ jobs:
       - name: Append latest if master branches # env '${IMAGE_TAG},latest'
         #eif: env.IMAGE_TAG == env.TAG_VERSION
         run: echo IMAGE_TAG=${IMAGE_TAG},master,latest >> ${GITHUB_ENV}
-      - name: Environment Printer
-        uses: managedkaos/print-env@v1.0
 
       - uses: docker/metadata-action@v4
         id: meta
