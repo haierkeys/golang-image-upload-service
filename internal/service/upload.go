@@ -126,10 +126,12 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
     } else {
 
-        _, _ = file.Seek(0, 0)
-        _, _ = io.Copy(writer, file)
+        file.Seek(0, 0)
+        io.Copy(writer, file)
 
     }
+
+    reader := bytes.NewReader(writer.Bytes())
 
     for _, v := range []string{"local_fs", "oss", "cloudflare_r2", "aws_s3"} {
 
@@ -161,8 +163,11 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
         } else {
             continue
         }
+
+        reader.Seek(0, 0)
+
         var err error
-        dstFileKey, err = up[v].SendFile(fileKey, writer, cType)
+        dstFileKey, err = up[v].SendFile(fileKey, reader, cType)
         if err != nil {
             return nil, err
         }
@@ -172,4 +177,13 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
     accessUrl := pkg_path.PathSuffixCheckAdd(global.Config.App.UploadUrlPre, "/") + upload.UrlEscape(dstFileKey)
 
     return &FileInfo{ImageTitle: fileHeader.Filename, ImageUrl: accessUrl}, nil
+}
+func MemDupReader(r io.Reader) func() io.Reader {
+    b := bytes.NewBuffer(nil)
+    t := io.TeeReader(r, b)
+
+    return func() io.Reader {
+        br := bytes.NewReader(b.Bytes())
+        return io.MultiReader(br, t)
+    }
 }
