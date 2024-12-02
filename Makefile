@@ -4,10 +4,19 @@ include .env
 #export $(shell sed 's/=.*//' .env)
 
 
-RemoteDockerHub = haierkeys
+DockerHubUser = haierkeys
+DockerHubName = obsidian-image-api-gateway
+
+
+# DockerHubName		=	$(shell basename "$(PWD)")
+projectRootDir	=	$(shell pwd)
+
 
 ReleaseTagPre = release-v
 DevelopTagPre = develop-v
+
+P_NAME = api
+P_BIN = image-api
 
 
 platform = $(shell uname -m)
@@ -28,7 +37,6 @@ BuildTime=$(shell date +%FT%T%z)
 goCmd	=	go
 
 
-
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X global.GitTag=$(GitTag) -X global.BuildTime=$(BuildTime)"
 
@@ -39,42 +47,26 @@ goClean	=	$(goCmd) clean
 goTest	=	$(goCmd) test
 goGet	=	$(goCmd) get -u
 
-projectName		=	$(shell basename "$(PWD)")
-projectRootDir	=	$(shell pwd)
 
 
 sourceDir	=	$(projectRootDir)
-bin			=	$(projectRootDir)/image-api
 cfgDir		=	$(projectRootDir)/config
 cfgFile		=	$(cfgDir)/config.yaml
 buildDir	=	$(projectRootDir)/build
-buildCfgDir	=	$(buildDir)/config
 
-.PHONY: all build build-all zip-all run test clean build-linux build-windows build-macos push-online push-dev build-t
-all: test build
-build:
-#	$(call checkStatic)
-	$(call init)
-	$(goBuild) -o $(bin) -v $(sourceDir)
-	@echo "Build OK"
-	mv $(bin) $(buildDir)
-	mkdir -p $(buildDir)/config
-	cp $(cfgDir)/config.yaml $(buildDir)/config
-	mkdir -p $(buildDir)/storage/logs
-	mkdir -p $(buildDir)/storage/uploads
-	mkdir -p $(buildDir)/storage/temp
+
+.PHONY: all build-all run test clean push-online push-dev build-macos-amd64 build-macos-arm64 build-linux-amd64 build-linux-arm64 build-winmdows-amd64
+all: test build-all
+
 
 build-all:
 #	$(call checkStatic)
-	$(MAKE) build-macos
-	$(MAKE) build-linux
-	$(MAKE) build-windows
+	$(MAKE) build-macos-amd64
+	$(MAKE) build-macos-arm64
+	$(MAKE) build-linux-amd64
+	$(MAKE) build-linux-arm64
+	$(MAKE) build-winmdows-amd64
 
-
-publish-all: build-all
-	tar -czvf $(buildDir)/image-api-windows-$(GitTag).tar.gz -C $(buildDir)/windows/ .
-	tar -czvf $(buildDir)/image-api-macos-$(GitTag).tar.gz -C $(buildDir)/macos/ .
-	tar -czvf $(buildDir)/image-api-linux-$(GitTag).tar.gz -C $(buildDir)/linux/ .
 
 run:
 #	$(call checkStatic)
@@ -89,8 +81,9 @@ run:
 # 	mv $(binNode) $(buildNodeDir)
 
 test:
-	@echo $(buildCmd)
+	@echo $(DockerHubName)
 	@echo "Test Completed"
+
 # $(goTest) -v -race -coverprofile=coverage.txt -covermode=atomic $(sourceAdmDir)
 # $(goTest) -v -race -coverprofile=coverage.txt -covermode=atomic $(sourceNodeDir)
 clean:
@@ -98,60 +91,38 @@ clean:
 
 push-online:  build-linux
 	$(call dockerImageClean)
-	docker build --platform linux/amd64  -t  $(RemoteDockerHub)/$(projectName):latest -f Dockerfile .
-	docker tag  $(RemoteDockerHub)/$(projectName):latest $(RemoteDockerHub)/$(projectName):$(ReleaseTagPre)$(GitTag)
+	docker build --platform linux/amd64  -t  $(DockerHubUser)/$(DockerHubName):latest -f Dockerfile .
+	docker tag  $(DockerHubUser)/$(DockerHubName):latest $(DockerHubUser)/$(DockerHubName):$(ReleaseTagPre)$(GitTag)
 
-	docker push $(RemoteDockerHub)/$(projectName):$(ReleaseTagPre)$(GitTag)
-	docker push $(RemoteDockerHub)/$(projectName):latest
+	docker push $(DockerHubUser)/$(DockerHubName):$(ReleaseTagPre)$(GitTag)
+	docker push $(DockerHubUser)/$(DockerHubName):latest
 
 
 push-dev:  build-linux
 	$(call dockerImageClean)
-	docker build --platform linux/amd64 -t $(RemoteDockerHub)/$(projectName):dev-latest -f Dockerfile .
-	docker tag $(RemoteDockerHub)/$(projectName):dev-latest $(RemoteDockerHub)/$(projectName):$(DevelopTagPre)$(GitTag)
+	docker build --platform linux/amd64 -t $(DockerHubUser)/$(DockerHubName):dev-latest -f Dockerfile .
+	docker tag $(DockerHubUser)/$(DockerHubName):dev-latest $(DockerHubUser)/$(DockerHubName):$(DevelopTagPre)$(GitTag)
 
-	docker push $(RemoteDockerHub)/$(projectName):$(DevelopTagPre)$(GitTag)
-	docker push $(RemoteDockerHub)/$(projectName):dev-latest
-
-
-build-macos:
-	$(call init)
-	rm -rf $(buildDir)/macos
-	mkdir -p $(buildDir)/macos/
-	GOOS=darwin GOARCH=amd64 $(goBuild) -o $(bin) -v $(sourceDir)
-	mv $(bin) $(buildDir)/macos/
-	mkdir -p $(buildDir)/macos/config
-	cp $(cfgDir)/config.yaml $(buildDir)/macos/config
-	mkdir -p $(buildDir)/macos/storage/logs
-	mkdir -p $(buildDir)/macos/storage/uploads
-	mkdir -p $(buildDir)/linux/storage/temp
-
-build-linux:
-	$(call init)
-	rm -rf $(buildDir)/linux
-	mkdir -p $(buildDir)/linux/
-	GOOS=linux GOARCH=amd64 $(goBuild) -o $(bin) -v $(sourceDir)
-	mv $(bin) $(buildDir)/linux/
-	mkdir -p $(buildDir)/linux/config
-	cp $(cfgDir)/config.yaml $(buildDir)/linux/config
-	mkdir -p $(buildDir)/linux/storage/logs
-	mkdir -p $(buildDir)/linux/storage/uploads
-	mkdir -p $(buildDir)/linux/storage/temp
+	docker push $(DockerHubUser)/$(DockerHubName):$(DevelopTagPre)$(GitTag)
+	docker push $(DockerHubUser)/$(DockerHubName):dev-latest
 
 
-build-windows:
-	$(call init)
-	rm -rf $(buildDir)/windows
-	mkdir -p $(buildDir)/windows/
-	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" $(goBuild) -o $(bin).exe -v $(sourceDir)
-	mv $(bin).exe $(buildDir)/windows/
-	mkdir -p $(buildDir)/windows/config
-	cp $(cfgDir)/config.yaml $(buildDir)/windows/config
-	mkdir -p $(buildDir)/windows/storage/logs
-	mkdir -p $(buildDir)/windows/storage/uploads
-	mkdir -p $(buildDir)/linux/storage/temp
 
-
+build-macos-amd64:
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(goBuild) -o $(buildDir)/darwin_amd64/${P_BIN} $(bin) -v $(sourceDir)
+build-macos-arm64:
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 $(goBuild) -o $(buildDir)/darwin_arm64/${P_BIN} -v $(sourceDir)
+build-linux-amd64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(goBuild) -o $(buildDir)/linux_amd64/${P_BIN} -v $(sourceDir)
+build-linux-arm64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(goBuild) -o $(buildDir)/linux_arm64/${P_BIN} -v $(sourceDir)
+build-windows-amd64:
+# CGO_ENABLED=0 CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="x86_64-w64-mingw32-gcc -fno-stack-protector -D_FORTIFY_SOURCE=0 -lssp" $(goBuild) -o $(bin).exe -v $(sourceDir)
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(goBuild) -o $(buildDir)/windows_amd64/${P_BIN}.exe -v $(sourceDir)
+gox-linux:
+	gox -osarch="linux/amd64 linux/arm64" -output="$(buildDir)/{{.OS}}_{{.Arch}}/${P_BIN}" ${LDFLAGS}
+gox-all:
+	gox -osarch="darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64" -output="$(buildDir)/{{.OS}}_{{.Arch}}/${P_BIN}" ${LDFLAGS}
 
 define dockerImageClean
 	@echo "docker Image Clean"
@@ -161,3 +132,5 @@ endef
 define init
 	@echo "Build Init"
 endef
+
+
