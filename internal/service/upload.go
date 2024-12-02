@@ -16,6 +16,7 @@ import (
     "golang.org/x/image/bmp"
     "golang.org/x/image/tiff"
     _ "golang.org/x/image/webp"
+    _ "github.com/gookit/goutil/dump"
 
     "github.com/haierspi/golang-image-upload-service/global"
     "github.com/haierspi/golang-image-upload-service/pkg/aws_s3"
@@ -124,7 +125,10 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
         }
 
     } else {
-        _, err = io.Copy(writer, file)
+
+        _, _ = file.Seek(0, 0)
+        _, _ = io.Copy(writer, file)
+
     }
 
     for _, v := range []string{"local_fs", "oss", "cloudflare_r2", "aws_s3"} {
