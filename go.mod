@@ -11,6 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.46
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.39
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.67.1
+	github.com/disintegration/imaging v1.6.2
 	github.com/gen2brain/avif v0.4.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/locales v0.14.1
@@ -19,7 +20,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gookit/goutil v0.6.17
 	github.com/juju/ratelimit v1.0.2
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
@@ -30,8 +30,8 @@ require (
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/w3liu/go-common v0.0.0-20210108072342-826b2f3582be
 	go.uber.org/zap v1.25.0
-	golang.org/x/image v0.22.0
-	golang.org/x/text v0.20.0
+	golang.org/x/image v0.23.0
+	golang.org/x/text v0.21.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v3 v3.0.1

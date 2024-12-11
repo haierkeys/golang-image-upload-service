@@ -9,14 +9,14 @@ import (
     "io"
     "mime/multipart"
 
+    "github.com/disintegration/imaging"
     "github.com/gen2brain/avif"
     "github.com/google/uuid"
-    "github.com/nfnt/resize"
+    _ "github.com/gookit/goutil/dump"
     "github.com/pkg/errors"
     "golang.org/x/image/bmp"
     "golang.org/x/image/tiff"
     _ "golang.org/x/image/webp"
-    _ "github.com/gookit/goutil/dump"
 
     "github.com/haierspi/golang-image-upload-service/global"
     "github.com/haierspi/golang-image-upload-service/pkg/aws_s3"
@@ -32,16 +32,19 @@ type FileInfo struct {
     ImageUrl   string `json:"imageUrl"`
 }
 
+type ClientUploadParams struct {
+    Key    string `form:"key"`
+    Type   string `form:"type"`
+    Width  int    `form:"width"`
+    Height int    `form:"height"`
+}
+
 type Uploader interface {
     SendFile(pathKey string, file io.Reader, cType string) (string, error)
     SendContent(pathKey string, content []byte) (string, error)
 }
 
-func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
-    return svc.fileSyncHandle(fileType, file, fileHeader)
-}
-
-func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
+func (svc *Service) UploadFile(fileType upload.FileType, file multipart.File, fileHeader *multipart.FileHeader, form *ClientUploadParams) (*FileInfo, error) {
 
     var fileName string
 
@@ -81,20 +84,104 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
 
     size := img.Bounds().Size()
 
-    if size.X > global.Config.App.ImageMaxSizeWidth || size.Y > global.Config.App.ImageMaxSizeHeight {
+    // 默认裁剪 | 居中裁剪 | 固定尺寸拉伸 | 固定尺寸等比缩放不裁切 | 不处理
+    // type: "fill-topleft" | "fill-center" | "resize" | "fit" | "none";
 
-        wRatio := float64(size.X) / float64(global.Config.App.ImageMaxSizeWidth)
-        hRatio := float64(size.Y) / float64(global.Config.App.ImageMaxSizeHeight)
-        ratio := wRatio
-        if hRatio > wRatio {
-            ratio = hRatio
+    // 服务器强制限制图片的宽度和高度
+    var imageMaxWidth = global.Config.App.ImageMaxSizeWidth
+    var imageMaxHeight = global.Config.App.ImageMaxSizeHeight
+    var newWidth, newHeight int
+    var newImage image.Image
+    var isNewImage bool
+
+    if form.Type == "none" || form.Type == "" {
+
+        newWidth = imageMaxWidth
+        newHeight = imageMaxHeight
+
+        if (size.X != newWidth || size.Y != newHeight) && (newWidth != 0 || newHeight != 0) {
+
+            if newWidth == 0 || newHeight == 0 {
+                newImage = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
+            } else {
+                newImage = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
+            }
+
+            isNewImage = true
         }
-        // 创建新的图像对象
-        newWidth := uint(float64(size.X) / ratio)
-        newHeight := uint(float64(size.Y) / ratio)
+    } else if form.Type == "fill-topleft" {
+        if form.Width < imageMaxWidth || imageMaxWidth == 0 {
+            newWidth = form.Width
+        } else {
+            newWidth = imageMaxWidth
+        }
+        if form.Height < imageMaxHeight || imageMaxHeight == 0 {
+            newHeight = form.Height
+        } else {
+            newHeight = imageMaxHeight
+        }
+
+        newImage = imaging.Fill(img, newWidth, newHeight, imaging.TopLeft, imaging.Lanczos)
+        isNewImage = true
+    } else if form.Type == "fill-center" {
+        if form.Width < imageMaxWidth || imageMaxWidth == 0 {
+            newWidth = form.Width
+        } else {
+            newWidth = imageMaxWidth
+        }
+        if form.Height < imageMaxHeight || imageMaxHeight == 0 {
+            newHeight = form.Height
+        } else {
+            newHeight = imageMaxHeight
+        }
+        // newImage = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
+        newImage = imaging.Fill(img, newWidth, newHeight, imaging.Center, imaging.Lanczos)
+        isNewImage = true
+    } else if form.Type == "resize" {
+
+        if form.Width < imageMaxWidth || imageMaxWidth == 0 {
+            newWidth = form.Width
+        } else {
+            newWidth = imageMaxWidth
+        }
+        if form.Height < imageMaxHeight || imageMaxHeight == 0 {
+            newHeight = form.Height
+        } else {
+            newHeight = imageMaxHeight
+        }
+
+        if form.Width != 0 && form.Height != 0 && (size.X != newWidth || size.Y != newHeight) {
+            newImage = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
+            isNewImage = true
+        }
+    } else if form.Type == "fit" {
+
+        if form.Width < imageMaxWidth || imageMaxWidth == 0 {
+            newWidth = form.Width
+        } else {
+            newWidth = imageMaxWidth
+        }
+        if form.Height < imageMaxHeight || imageMaxHeight == 0 {
+            newHeight = form.Height
+        } else {
+            newHeight = imageMaxHeight
+        }
+
+        if (size.X != newWidth || size.Y != newHeight) && (newWidth != 0 || newHeight != 0) {
+
+            if newWidth == 0 || newHeight == 0 {
+                newImage = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
+            } else {
+                newImage = imaging.Fit(img, newWidth, newHeight, imaging.Lanczos)
+            }
+
+            isNewImage = true
+        }
+    }
+
+    if isNewImage {
 
         // 调整图片大小
-        newImage := resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
 
         switch filetype {
         case "png":
@@ -125,10 +212,8 @@ func (svc *Service) fileSyncHandle(fileType upload.FileType, file multipart.File
         }
 
     } else {
-
         file.Seek(0, 0)
         io.Copy(writer, file)
-
     }
 
     reader := bytes.NewReader(writer.Bytes())
